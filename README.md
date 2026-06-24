@@ -2,7 +2,7 @@
 
 ![Banner Oficial Argos Guard](./banner_marketing.png)
 
-> ### 📥 [Descargar Instalador Argos Guard v3.6.2](https://github.com/betorockers/ArgosGuardEnterprise/releases/latest)
+> ### 📥 [Descargar Instalador Argos Guard v3.6.2](https://github.com/betorockers/ArgosGuardEnterprise/releases/latest/download/Instalador_ArgosGuard_v3.6.2.exe)
 [![Python Version](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/)
 [![Next.js Version](https://img.shields.io/badge/Next.js-16.2-black.svg)](https://nextjs.org/)
 [![Package Manager](https://img.shields.io/badge/pnpm-11.5-orange.svg)](https://pnpm.io/)
