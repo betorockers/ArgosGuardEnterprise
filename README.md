@@ -8,7 +8,7 @@
 
 **Argos Guard Enterprise** es la solución definitiva de monitoreo activo de redes locales (LAN) y servicios aplicativos en la nube (L7). Diseñada bajo la filosofía de "Caja Negra" (Black-Box Agentless), permite vigilar la disponibilidad, latencia y salud de infraestructura crítica de seguridad (como cámaras LPR, tótems de control de acceso, gateways de pago, servidores web, bases de datos y dispositivos de red) sin requerir agentes instalados en los destinos.
 
-Esta versión 3.6.2 consolida la evolución hacia una **Arquitectura de Escritorio Nativa (PyWebView)** y un backend asíncrono robusto, eliminando dependencias de navegadores externos y parpadeos molestos, y sumando integraciones con la nube de Supabase y alertas de Telegram.
+Esta versión 3.6.2 consolida la evolución hacia una **Arquitectura de Escritorio Nativa (PyWebView)** y un backend asíncrono robusto, eliminando dependencias de navegadores externos y parpadeos molestos. Además, suma la integración masiva con la nube de Supabase, alertas de Telegram y un **Motor de Actualización Automática OTA (Auto-Updater)** impulsado por GitHub Releases.
 
 ---
 
@@ -26,7 +26,9 @@ Esta versión 3.6.2 consolida la evolución hacia una **Arquitectura de Escritor
 
 ### 🔹 Funciones Secundarias (Control y Operación)
 *   **Telemetría en Tiempo Real:** Dashboard dinámico Next.js que se actualiza instantáneamente sin necesidad de recargar la página mediante canales persistentes de WebSockets.
-*   **Log de Auditoría Completo:** Trazabilidad inalterable de cada evento de red, cambios de configuración, inicios de sesión y bloqueos en una base de datos segura.
+*   **Motor de Auto-Actualización OTA**: Integración directa con GitHub Releases. Los parches de seguridad menores se descargan e instalan de forma 100% silenciosa en segundo plano, mientras que los saltos de versión mayores ofrecen un modal interactivo, asegurando que la flota de clientes siempre corra la última versión sin destruir la base de datos local de SQLite.
+*   **Auditoría e Historial Forense**: Registro granular e inalterable de cada evento de red.
+*   **Sistema Anti-Flicker**: Eliminación de destellos en la terminal usando directivas `CREATE_NO_WINDOW` de la API Win32 y encapsulación Nuitka para una experiencia premium y nativa.
 *   **Histórico y Métricas en Serie Temporal:** Gráficos intuitivos de rendimiento de latencia histórica y tiempos de respuesta.
 *   **Sistema de Licencias RSA-2048 / HWID:** Control estricto de despliegues comerciales bloqueado a la huella digital física del hardware del servidor cliente.
 
