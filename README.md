@@ -1,5 +1,8 @@
 # 🛡️ Argos Guard Enterprise v3.0
 
+![Banner Oficial Argos Guard](./banner_marketing.png)
+
+> ### 📥 [Descargar Instalador Argos Guard v3.6.2](https://github.com/betorockers/ArgosGuardEnterprise/releases/latest)
 [![Python Version](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/)
 [![Next.js Version](https://img.shields.io/badge/Next.js-16.2-black.svg)](https://nextjs.org/)
 [![Package Manager](https://img.shields.io/badge/pnpm-11.5-orange.svg)](https://pnpm.io/)
@@ -56,25 +59,58 @@ Argos Guard Enterprise ha sido auditado y blindado contra vectores de ataque del
 
 ---
 
-## 📈 Análisis de Tendencias de Mercado y Dolores que Solucionamos
+## 📈 Análisis Competitivo del Mercado (2026)
+
+Para establecer un valor comercial realista y atractivo, hemos analizado a los 4 gigantes de la industria del monitoreo de red y hemos posicionado a Argos Guard como la opción de mayor rentabilidad.
+
+| Competidor | Modelo Comercial | Costo Estimado (Red de 500 Nodos) | Debilidades Clave (vs Argos) |
+| :--- | :--- | :--- | :--- |
+| **PRTG Paessler** | Suscripción (Sensores) | **$3,500 - $5,000 USD / Año** | Precios restrictivos por cada sensor, no por dispositivo. |
+| **Nagios XI** | Licencia Perpetua | **$3,500+ inicial** (+20% mant. anual) | Interfaz arcaica, muy complejo de instalar (requiere Linux). |
+| **Datadog** | SaaS Cloud | **$30,000+ USD / Año** | Excesivo costo recurrente. Requiere enviar datos a la nube. |
+| **LogicMonitor**| SaaS Cotización | **$15,000 - $30,000 USD / Año** | Precios opacos, 100% dependiente de internet. |
+| **Argos Guard Enterprise** | **Pago Único Perpetuo** | **Desde $299 USD** | **Sin debilidades locales.** Agentless, SQLite Integrado, Privado. |
 
 ### 📉 Dolores del Mercado Solucionados
-1.  **Costos Exorbitantes de SaaS:** En 2026, la mayoría de herramientas de monitoreo de red (Datadog, LogicMonitor, Kentik) cobran tarifas recurrentes elevadas basadas en la cantidad de hosts y el volumen de telemetría. Para una organización con cientos de cámaras o terminales IoT, esto es financieramente inviable. **Argos Guard Enterprise soluciona esto mediante un licenciamiento de pago único auto-alojado sin costes ocultos.**
-2.  **Soberanía de Datos e Infraestructura Crítica:** Muchas agencias de seguridad física, aeropuertos y plantas industriales tienen prohibido enviar la topología de su red local, direcciones IP o logs de eventos a la nube (nube SaaS). **Argos Guard es 100% On-Premise, manteniendo toda la información confidencial de forma local en SQLite encriptado (WAL) o bases de datos internas.**
-3.  **Complejidad de Agentes:** El monitoreo tradicional con Zabbix o Nagios requiere la configuración compleja de demonios SNMP o agentes residentes en cada equipo. En cámaras IP o controladores IoT de acceso esto no es factible. **Argos Guard es completamente "Agentless" (L3/L7 Black-Box).**
-4.  **Fatiga por Alertas y Spam:** Los administradores sufren de fatiga de notificaciones al recibir alertas a altas horas de la noche. **Nuestra función de Telegram permite acotar el horario de envío en una ventana personalizada de alertas laborales.**
+1.  **Costos Exorbitantes de SaaS:** En 2026, la mayoría de herramientas de monitoreo de red cobran tarifas recurrentes elevadas. **Argos Guard soluciona esto mediante un licenciamiento de pago único auto-alojado sin costes ocultos.**
+2.  **Soberanía de Datos e Infraestructura Crítica:** Muchas agencias tienen prohibido enviar su topología a la nube. **Argos Guard es 100% On-Premise, manteniendo toda la información confidencial de forma local.**
+3.  **Complejidad de Agentes:** El monitoreo tradicional requiere demonios SNMP/NRPE. **Argos Guard es completamente "Agentless" (L3/L7 Black-Box).**
 
-### 📊 Comparativa de Mercado
+---
 
-| Característica | Argos Guard Enterprise v3.0 | Datadog / SaaS | PRTG Monitor | Nagios / Zabbix |
-| :--- | :--- | :--- | :--- | :--- |
-| **Arquitectura de Despliegue** | On-Premise (Local/Docker) | Cloud (SaaS Externo) | Windows Server local | On-Premise / Agentes |
-| **Modelo de Costos** | Licencia Única / Perpetua | Suscripción Mensual Excesiva | Licencia por Sensores (Caras) | Open Source (Alto costo de soporte) |
-| **Instalación de Agentes** | **No requiere (Agentless)** | Requiere agente instalado | No requiere | Requiere agentes y SNMP |
-| **Seguridad de Acceso** | Argon2id + MFA + RBAC | Autenticación Cloud | Acceso Básico local | Parches de Seguridad manuales |
-| **Control Anti-Scraping / Rate Limit** | **Sí (Token Bucket nativo)** | Sí (General) | No cuenta | No cuenta de forma nativa |
-| **Instalador Inteligente** | **Sí (Autoinstalador de dependencias)** | Sí | Complejo | Extremadamente complejo |
-| **Integración de Alertas** | Telegram / Ventana Horaria | Multi-integración | Correos / SMS | Scripts complejos |
+## 💰 Estrategia de Precios y Tiers Comerciales
+
+Nuestra estructura de licenciamiento basada en la capacidad (Nodos L3/L7) está diseñada para adaptarse tanto a pequeños comercios como a infraestructuras críticas gubernamentales, asegurando una alta tasa de conversión.
+
+*Precios en USD para licenciamiento perpetuo (Pago Único) atado a la huella digital física del hardware.*
+
+### 🟢 Nivel 1: Argos Guard BASIC
+Ideal para pequeñas oficinas, retails y locales comerciales que necesitan vigilar puntos de venta o sistemas de CCTV básicos.
+* **Costo (Licencia Perpetua):** **$299 USD** 
+* **Límites:** Hasta 50 IPs / Dispositivos.
+* **Características Clave:**
+  * Ping ICMP y Web Probes básicas.
+  * Dashboard nativo oscuro anti-flicker.
+
+### 🔵 Nivel 2: Argos Guard STANDARD *(Recomendado)*
+El "Sweet Spot" de ventas para integradores de seguridad e instaladores de redes medianas.
+* **Costo (Licencia Perpetua):** **$699 USD**
+* **Límites:** Hasta 250 IPs / Dispositivos.
+* **Características Clave:**
+  * Todo lo del plan Basic.
+  * Notificaciones de Telegram en tiempo real.
+  * Auto-Updater OTA silencioso.
+  * 3 usuarios con roles jerárquicos (RBAC).
+
+### 🟣 Nivel 3: Argos Guard ENTERPRISE
+Destinado a corporaciones, naves industriales, infraestructuras críticas y aeropuertos.
+* **Costo (Licencia Perpetua):** **$1,499 USD**
+* **Límites:** ILIMITADOS (Sin límite por software).
+* **Características Clave:**
+  * Todo lo del plan Standard.
+  * Auditoría agresiva de red (Nmap Port Scans, Análisis ARP spoofing).
+  * Panel forense de logs inalterables.
+  * Usuarios ilimitados y soporte prioritario.
 
 ---
 
