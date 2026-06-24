@@ -1,173 +1,142 @@
-<div align="center">
+# 🛡️ Argos Guard Enterprise v3.0
 
-<img src="https://raw.githubusercontent.com/betorockers/ArgosGuardEnterprise/main/assets/img/LogoArgosGuard.png" alt="Argos Guard Enterprise" width="120"/>
+[![Python Version](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/)
+[![Next.js Version](https://img.shields.io/badge/Next.js-16.2-black.svg)](https://nextjs.org/)
+[![Package Manager](https://img.shields.io/badge/pnpm-11.5-orange.svg)](https://pnpm.io/)
+[![Security Level](https://img.shields.io/badge/Security-Military%20%2F%20Industrial-red.svg)](#-arquitectura-de-seguridad-y-blindaje-militar)
+[![License](https://img.shields.io/badge/License-Commercial%20Enterprise-gold.svg)](#-licenciamiento)
 
-# ARGOS GUARD ENTERPRISE
+**Argos Guard Enterprise** es la solución definitiva de monitoreo activo de redes locales (LAN) y servicios aplicativos en la nube (L7). Diseñada bajo la filosofía de "Caja Negra" (Black-Box Agentless), permite vigilar la disponibilidad, latencia y salud de infraestructura crítica de seguridad (como cámaras LPR, tótems de control de acceso, gateways de pago, servidores web, bases de datos y dispositivos de red) sin requerir agentes instalados en los destinos.
 
-### Plataforma Profesional de Monitoreo de Red & Seguridad Operacional
-
-[![Version](https://img.shields.io/badge/Version-3.6.2-cyan?style=for-the-badge&logo=shield)](https://github.com/betorockers/ArgosGuardEnterprise/releases)
-[![Platform](https://img.shields.io/badge/Platform-Windows-blue?style=for-the-badge&logo=windows)](https://github.com/betorockers/ArgosGuardEnterprise/releases)
-[![Backend](https://img.shields.io/badge/Backend-FastAPI%20%2B%20Python-green?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
-[![Frontend](https://img.shields.io/badge/Frontend-Next.js%2015-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org)
-[![License](https://img.shields.io/badge/License-Commercial-orange?style=for-the-badge)](https://betograf.cl)
+Esta versión 3.6.2 consolida la evolución hacia una **Arquitectura de Escritorio Nativa (PyWebView)** y un backend asíncrono robusto, eliminando dependencias de navegadores externos y parpadeos molestos, y sumando integraciones con la nube de Supabase y alertas de Telegram.
 
 ---
 
-**🛡️ Monitoreo continuo · Alertas en tiempo real · Seguridad de red empresarial**
+## 🚀 Capacidades y Funcionalidades Clave
 
-[⬇️ Descargar Ahora](#-descarga-directa) · [📄 Documentación](#-características-principales) · [💬 Soporte](#-soporte-y-contacto)
+### 🔹 Funciones Principales (Core)
+*   **Interfaz Nativa de Escritorio:** Interfaz impulsada por PyWebView que actúa como aplicación de Windows sin depender de Chrome o Edge, integrándose con cuadros de diálogo nativos del explorador de archivos.
+*   **Anti-Parpadeo (Flicker-Free):** Integración profunda con la API de subprocesos de Windows (`CREATE_NO_WINDOW`) que permite ejecuciones de ICMP/Nmap asíncronas totalmente silenciosas y limpias de fondo.
+*   **Monitoreo L3 Asíncrono de Alto Rendimiento:** Ping ICMP no bloqueante e independiente en paralelo para cientos de direcciones IP concurrentes usando `asyncio` de Python.
+*   **Monitoreo L7 (Web Probes):** Consultas periódicas a endpoints HTTP/HTTPS con validación de códigos de estado de respuesta (ej: 200 OK) y búsqueda de palabras clave dentro del cuerpo de la respuesta para garantizar que las páginas web operen correctamente.
+*   **Monitoreo de Certificados SSL/TLS:** Análisis automatizado de las cadenas de confianza HTTP y cálculo predictivo de días de expiración con alertas proactivas si restan menos de 15 días de validez.
+*   **Escaneo de Puertos Activo (Port Auditing):** Detección asíncrona periódica de puertos abiertos para control de vulnerabilidades e intrusiones.
+*   **Auditoría y Mapeo ARP:** Resolución automática y mapeo constante de direcciones MAC físicas de la red local para verificar la autenticidad física de las IPs (Detección de spoofing).
+*   **Alertas Asíncronas Multicanal (Telegram):** Integración nativa con la API de bots de Telegram para notificar de inmediato caídas, recuperaciones de dispositivos, creación/eliminación de equipos y eliminación de usuarios.
 
-</div>
-
----
-
-## ¿Qué es Argos Guard Enterprise?
-
-**Argos Guard Enterprise** es una plataforma de monitoreo de infraestructura de red diseñada para equipos de TI, administradores de sistemas y equipos de operaciones que necesitan **visibilidad total, alertas instantáneas y control de seguridad** sobre su red en tiempo real.
-
-Desarrollado con arquitectura moderna (FastAPI + Next.js), compilado como **ejecutable standalone nativo de Windows**, no requiere instalación de Python ni dependencias externas. Un solo archivo `.exe` y tu infraestructura queda bajo vigilancia las 24/7.
-
-> _"Diseñado por administradores de red, para administradores de red."_
-
----
-
-## 🏆 ¿Por qué elegir Argos Guard Enterprise?
-
-| Característica | Argos Guard | Herramientas Tradicionales |
-|---|:---:|:---:|
-| **Instalación en 1 clic** | ✅ `.exe` standalone | ❌ Múltiples dependencias |
-| **Dashboard en tiempo real (WebSocket)** | ✅ | ⚠️ Polling manual |
-| **Alertas Telegram instantáneas** | ✅ GuardBot nativo | ❌ Requiere plugins |
-| **Monitoreo L3 + L7 unificado** | ✅ ICMP + HTTP/S | ⚠️ Herramientas separadas |
-| **Auditoría de puertos TCP** | ✅ Integrado | ❌ Herramienta externa |
-| **Certificados SSL — alerta 15 días antes** | ✅ Automático | ❌ Manual |
-| **Control de licencias por HWID + Cloud** | ✅ Supabase | ❌ |
-| **Bug Reporter con envío automático** | ✅ | ❌ |
-| **MFA / TOTP integrado** | ✅ | ⚠️ Configuración compleja |
-| **Generación de Reportes PDF** | ✅ | ⚠️ Exportación manual |
+### 🔹 Funciones Secundarias (Control y Operación)
+*   **Telemetría en Tiempo Real:** Dashboard dinámico Next.js que se actualiza instantáneamente sin necesidad de recargar la página mediante canales persistentes de WebSockets.
+*   **Log de Auditoría Completo:** Trazabilidad inalterable de cada evento de red, cambios de configuración, inicios de sesión y bloqueos en una base de datos segura.
+*   **Histórico y Métricas en Serie Temporal:** Gráficos intuitivos de rendimiento de latencia histórica y tiempos de respuesta.
+*   **Sistema de Licencias RSA-2048 / HWID:** Control estricto de despliegues comerciales bloqueado a la huella digital física del hardware del servidor cliente.
 
 ---
 
-## 🚀 Características Principales
+## 🛡️ Arquitectura de Seguridad y Blindaje Militar
 
-### 🌐 Motor de Monitoreo Asíncrono (L3 · L4 · L7)
-- **Ping ICMP de alta frecuencia** — hasta 16 dispositivos simultáneos en Enterprise
-- **HTTP/S Probe L7** — verifica disponibilidad de portales web con validación de contenido esperado
-- **Escáner de puertos TCP** — auditoría de superficie de ataque en tiempo real
-- **WebSocket Broadcast** — el dashboard se actualiza al instante sin recargar la página
-- **Detección de latencia** — gráficas históricas de respuesta por dispositivo
+Argos Guard Enterprise ha sido auditado y blindado contra vectores de ataque del OWASP Top 10 bajo estrictos estándares militares e industriales:
 
-### 🚨 Sistema de Alertas Inteligente
-- **GuardBot (Telegram)** — recibe alertas al instante en tu teléfono con formato enterprise profesional
-- **Ventana horaria configurable** — define entre qué horas quieres recibir notificaciones (ej: 09:00–17:00)
-- **Tiempo de caída calculado** — cada alerta de recuperación incluye el tiempo exacto fuera de línea
-- **Sonido de alerta local** — señal auditiva en el sistema cuando se detecta una caída
-
-### 📊 Dashboard Unificado
-- **Vista de Monitoreo Activo** — estado en tiempo real de todos los equipos con indicadores visuales
-- **Gestión de Equipos & L7 Probes** — agrega, edita y elimina equipos desde la interfaz
-- **Métricas y SLA** — historial de conectividad, latencia promedio e incidentes
-- **Auditoría de Seguridad** — log completo de incidentes, cambios de estado y acciones de usuarios
-
-### 🔐 Seguridad & Licenciamiento
-- **Validación de licencias cloud** — verificación contra Supabase con HWID binding
-- **Cache offline seguro** — si cae la red, el sistema sigue operando con caché local cifrado
-- **Trial 21 días protegido** — firma criptográfica HMAC-SHA256 anti-manipulación
-- **Autenticación MFA/TOTP** — segundo factor de autenticación para el acceso al panel
-- **Roles de usuario** — Super Admin, Operador y Lector con permisos diferenciados
-
-### 📄 Reportes & Exportación
-- **Generación de PDF** — reportes de estado, incidentes y métricas SLA exportables
-- **Bug Reporter integrado** — captura automática de errores con envío a soporte técnico por correo
+1.  **Protección de Credenciales (Argon2id):** Almacenamiento seguro de contraseñas utilizando hashing unidireccional con Argon2id configurado según los estándares OWASP (64MB de coste de memoria, 3 iteraciones de CPU, 4 hilos en paralelo). Este algoritmo es altamente resistente al agrietamiento por GPU y ASICs.
+2.  **Autenticación Multifactor (MFA/TOTP):** Integración nativa para la configuración de un segundo factor dinámico usando tokens TOTP con cualquier aplicación autenticadora (Google Authenticator, Authy, etc.) mediante códigos QR temporales.
+3.  **Control de Acceso Basado en Roles Jerárquicos (RBAC Estricto):**
+    *   `super_admin`: Control absoluto del sistema. Es **invisible e intocable** para los administradores de menor rango.
+    *   `admin`: Gestión de equipos, creación y gestión de usuarios menores, y acceso a logs. No puede escalar ni comprometer al super_admin.
+    *   `operator`: Creación, actualización y monitoreo activo de equipos y sondas.
+    *   `reader`: Visualización en tiempo real del dashboard y métricas (Solo Lectura).
+4.  **Anti-Fuerza Bruta (Login Rate Limiter):** Limitador de tasa asíncrono en memoria usando el algoritmo Token Bucket que restringe los inicios de sesión a un máximo de **5 intentos cada 30 segundos por IP**, previniendo ataques de diccionario y recolección de usuarios (scraping).
+5.  **Anti-WebScraping y Protección de Endpoints:** Límite general de la API de **60 peticiones por minuto por IP** en todos los endpoints de datos sensibles (métricas, logs, equipos) para evitar descargas automatizadas masivas de la estructura de la red local.
+6.  **Cabeceras de Seguridad Militar HTTP:**
+    *   `X-Frame-Options: DENY` para mitigar ataques de secuestro de clics (Clickjacking).
+    *   `X-Content-Type-Options: nosniff` para desactivar el rastreo MIME no seguro.
+    *   `Content-Security-Policy (CSP)` restrictivo para prevenir inyecciones XSS bloqueando recursos no autorizados.
+    *   `Strict-Transport-Security (HSTS)` forzado en entornos de producción.
+7.  **Inyección de Comandos Bloqueada:** Todos los comandos de red externos (Pings, ARP) son ejecutados a través de listas sanitizadas con `asyncio.create_subprocess_exec` desactivando de forma estricta el procesador del shell del sistema operativo (`shell=False`), lo que hace técnicamente imposible una inyección de comandos remota.
 
 ---
 
-## 📥 Descarga Directa
+## 📈 Análisis de Tendencias de Mercado y Dolores que Solucionamos
 
-> ⚠️ **Requiere Windows 10/11 (64-bit)**. No necesita Python instalado.
+### 📉 Dolores del Mercado Solucionados
+1.  **Costos Exorbitantes de SaaS:** En 2026, la mayoría de herramientas de monitoreo de red (Datadog, LogicMonitor, Kentik) cobran tarifas recurrentes elevadas basadas en la cantidad de hosts y el volumen de telemetría. Para una organización con cientos de cámaras o terminales IoT, esto es financieramente inviable. **Argos Guard Enterprise soluciona esto mediante un licenciamiento de pago único auto-alojado sin costes ocultos.**
+2.  **Soberanía de Datos e Infraestructura Crítica:** Muchas agencias de seguridad física, aeropuertos y plantas industriales tienen prohibido enviar la topología de su red local, direcciones IP o logs de eventos a la nube (nube SaaS). **Argos Guard es 100% On-Premise, manteniendo toda la información confidencial de forma local en SQLite encriptado (WAL) o bases de datos internas.**
+3.  **Complejidad de Agentes:** El monitoreo tradicional con Zabbix o Nagios requiere la configuración compleja de demonios SNMP o agentes residentes en cada equipo. En cámaras IP o controladores IoT de acceso esto no es factible. **Argos Guard es completamente "Agentless" (L3/L7 Black-Box).**
+4.  **Fatiga por Alertas y Spam:** Los administradores sufren de fatiga de notificaciones al recibir alertas a altas horas de la noche. **Nuestra función de Telegram permite acotar el horario de envío en una ventana personalizada de alertas laborales.**
 
-| Versión | Archivo | Tamaño |
-|---------|---------|--------|
-| **v3.6.2 — Producción** | [ArgosGuard.exe](https://github.com/betorockers/ArgosGuardEnterprise/releases/latest/download/ArgosGuard.exe) | ~4.4 MB |
+### 📊 Comparativa de Mercado
 
-### Ejecución rápida
-
-1. Descarga `ArgosGuard.exe` desde la sección [Releases](https://github.com/betorockers/ArgosGuardEnterprise/releases)
-2. Ejecuta el archivo — el sistema iniciará el backend automáticamente
-3. Abre tu navegador en `http://localhost:3000`
-4. En el primer inicio, crea tu Super Administrador
-5. ¡Comienza a monitorear tu red!
-
----
-
-## 🏷️ Planes y Licencias
-
-| Plan | Dispositivos | Capacidades | HWID | Precio |
-|------|:---:|---|:---:|:---:|
-| **Trial / Demo** | 1 equipo | L3 + L7 + Puertos · 21 días | — | Gratis |
-| **Básico** | 2 equipos | Monitoreo L3 (Ping ICMP) | ✅ | Contactar |
-| **Estándar** | 5 equipos | L3 + L7 (HTTP/S Probe) | ✅ | Contactar |
-| **Enterprise** | 16 equipos | L3 + L7 + Puertos TCP | ✅ | Contactar |
-
-> Las licencias se validan en la nube vía **Supabase** y quedan vinculadas al hardware del equipo (HWID) para prevenir uso no autorizado.
+| Característica | Argos Guard Enterprise v3.0 | Datadog / SaaS | PRTG Monitor | Nagios / Zabbix |
+| :--- | :--- | :--- | :--- | :--- |
+| **Arquitectura de Despliegue** | On-Premise (Local/Docker) | Cloud (SaaS Externo) | Windows Server local | On-Premise / Agentes |
+| **Modelo de Costos** | Licencia Única / Perpetua | Suscripción Mensual Excesiva | Licencia por Sensores (Caras) | Open Source (Alto costo de soporte) |
+| **Instalación de Agentes** | **No requiere (Agentless)** | Requiere agente instalado | No requiere | Requiere agentes y SNMP |
+| **Seguridad de Acceso** | Argon2id + MFA + RBAC | Autenticación Cloud | Acceso Básico local | Parches de Seguridad manuales |
+| **Control Anti-Scraping / Rate Limit** | **Sí (Token Bucket nativo)** | Sí (General) | No cuenta | No cuenta de forma nativa |
+| **Instalador Inteligente** | **Sí (Autoinstalador de dependencias)** | Sí | Complejo | Extremadamente complejo |
+| **Integración de Alertas** | Telegram / Ventana Horaria | Multi-integración | Correos / SMS | Scripts complejos |
 
 ---
 
-## 🛠️ Stack Tecnológico
+## ⚙️ Arquitectura Técnica de Despliegue
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                  ARGOS GUARD ENTERPRISE             │
-├─────────────────┬───────────────────────────────────┤
-│   FRONTEND      │   Next.js 15 · React · TypeScript │
-│                 │   WebSocket · Tailwind CSS         │
-├─────────────────┼───────────────────────────────────┤
-│   BACKEND       │   Python 3.13 · FastAPI · asyncio │
-│                 │   SQLite (WAL) · JWT · MFA/TOTP   │
-├─────────────────┼───────────────────────────────────┤
-│   CLOUD         │   Supabase (PostgreSQL + RLS)      │
-│                 │   Validación de licencias HWID     │
-├─────────────────┼───────────────────────────────────┤
-│   ALERTAS       │   Telegram Bot API (GuardBot)      │
-│                 │   Ventana horaria configurable     │
-├─────────────────┼───────────────────────────────────┤
-│   COMPILACIÓN   │   Nuitka → C++ nativo Windows     │
-│                 │   Ejecutable standalone 4.4 MB     │
-└─────────────────┴───────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    ARGOS GUARD ENTERPRISE v3.0               │
+├──────────────────────┬──────────────────────────────────────┤
+│   FRONTEND           │   BACKEND                             │
+│   Next.js 16         │   FastAPI + Uvicorn                   │
+│   (Turbopack)        │   Python 3.13                         │
+│   :3000              │   :8000                               │
+│                      │                                        │
+│  ┌──────────────┐    │  ┌─────────────────────────────────┐  │
+│  │  Login Page  │    │  │  Routers (Rate limited API)      │  │
+│  │  Dashboard   │◄───┤  │  ├─ /api/v1/auth/*              │  │
+│  │  Devices     │    │  │  ├─ /api/v1/devices/*            │  │
+│  │  Metrics     │    │  │  ├─ /api/v1/metrics/*            │  │
+│  │  License     │    │  │  └─ /ws/monitor (WebSockets)     │  │
+│  └──────────────┘    │  └─────────────────────────────────┘  │
+│         ▲            │                │                        │
+│         │ WS         │  ┌─────────────▼───────────────────┐  │
+│  ┌──────┴───────┐    │  │  AsyncPingEngine                  │  │
+│  │ WebSocket    │    │  │  - Ping (L3) & HTTP Probes (L7)  │  │
+│  │ Context      │◄───┤  │  - Telegram Alerts (Asíncrono)  │  │
+│  └──────────────┘    │  └─────────────────────────────────┘  │
+│                      │                │                        │
+│                      │  ┌─────────────▼───────────────────┐  │
+│                      │  │  AsyncDatabaseManager            │  │
+│                      │  │  SQLite WAL / PostgreSQL pool    │  │
+│                      │  └─────────────────────────────────┘  │
+└──────────────────────┴──────────────────────────────────────┘
 ```
 
 ---
 
-## 💬 Soporte y Contacto
+## 🛠️ Guía Rápida de Despliegue
 
-¿Necesitas ayuda técnica, quieres adquirir una licencia o tienes preguntas comerciales?
+### Requisitos Previos
+*   **Docker Desktop** y **Docker Compose** instalados (entorno de producción).
+*   **Python 3.13+** y **Node.js 20+** (entorno de desarrollo local).
 
-| Canal | Contacto |
-|-------|----------|
-| 🛠️ **Soporte Técnico** | [soporte@betograf.cl](mailto:soporte@betograf.cl) |
-| 💼 **Atención Comercial** | [contacto@betograf.cl](mailto:contacto@betograf.cl) |
-| 🌐 **Sitio Web** | [betograf.cl](https://betograf.cl) |
-| 🐛 **Reportar un Bug** | [Issues](https://github.com/betorockers/ArgosGuardEnterprise/issues) |
+### Despliegue en Producción (Docker)
+1.  Clonar el repositorio en el servidor de destino.
+2.  Configurar las variables de entorno en el archivo `.env`.
+3.  Ejecutar el instalador automatizado para Windows:
+    ```powershell
+    .\installer.bat
+    ```
+    *Este script validará prerrequisitos, comprobará si existe Edge/Chrome (instalándolo de forma silenciosa y segura en caso de ausencia), compilará las imágenes Docker y levantará el servicio completo.*
+
+### Ejecución en Modo Nativo (Escritorio)
+Para arrancar Argos Guard con una experiencia idéntica a una aplicación de escritorio nativa:
+1.  Asegúrese de tener activado su entorno virtual y los servidores corriendo.
+2.  Ejecute el lanzador en la raíz:
+    ```powershell
+    python main.py
+    ```
+    *Este comando detectará la API, compilará y abrirá automáticamente Microsoft Edge o Google Chrome en modo de aplicación borderless (`--app`) a pantalla completa.*
 
 ---
 
-## ⚖️ Licencia y Términos
+## 👥 Equipo y Soporte
 
-Argos Guard Enterprise es un software comercial propietario desarrollado por **Betograf**.
-
-- ✅ Uso personal y empresarial permitido con licencia activa
-- ❌ Redistribución, ingeniería inversa o modificación no autorizadas
-- ✅ Trial gratuito de 21 días sin tarjeta de crédito
-
-© 2026 Betograf · Anvic Security · Todos los derechos reservados.
-
----
-
-<div align="center">
-
-**Hecho con 🛡️ en Chile por [Betograf](https://betograf.cl)**
-
-_Argos Guard Enterprise — Porque tu infraestructura merece vigilancia de clase mundial._
-
-</div>
+Desarrollado de forma exclusiva por **Betograf_inc**  
+*Staff Architect:* **betorock**
