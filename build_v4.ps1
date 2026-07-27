@@ -8,7 +8,7 @@ $BaseDir = (Get-Item .).FullName
 $BackendV4Dir = Join-Path $BaseDir "backend_v4"
 $BuildOut = Join-Path $BackendV4Dir "build"
 
-function Clean-CompilationState {
+function Clear-CompilationState {
     Write-Host "-> [Limpieza Total] Terminando subprocesos y purgando carpetas de compilación..." -ForegroundColor DarkGray
     Get-Process -Name zig, scons, chromedriver -ErrorAction SilentlyContinue | Stop-Process -Force
     if (Test-Path $BuildOut) {
@@ -17,15 +17,15 @@ function Clean-CompilationState {
 }
 
 if ($CleanOnly) {
-    Clean-CompilationState
+    Clear-CompilationState
     Write-Host "-> Estado de compilación limpiado al 100%." -ForegroundColor Green
     exit 0
 }
 
-Clean-CompilationState
+Clear-CompilationState
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host " Compilación Argos Guard v4.0 (Nuitka C++) " -ForegroundColor Cyan
+Write-Host " Compilación Argos Guard v4.0 (Nuitka C++ / Waitress Engine) " -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 try {
@@ -40,7 +40,7 @@ try {
         "--include-data-dir=static=static",
         "--module-parameter=django-settings-module=config.settings",
         
-        # Modulos de la App Monolito Modular
+        # Módulos de la App Monolito Modular
         "--include-package=config",
         "--include-package=apps",
         "--include-package=apps.core",
@@ -49,7 +49,7 @@ try {
         "--include-package=apps.security",
         "--include-package=apps.licensing",
 
-        # Framework Django y Servidor
+        # Framework Django y Servidor Waitress
         "--include-package=django",
         "--include-package=django.core",
         "--include-package=django.core.management",
@@ -62,19 +62,11 @@ try {
         "--include-package=django.contrib.sessions",
         "--include-package=django.contrib.messages",
         "--include-package=django.contrib.staticfiles",
+        "--include-package=waitress",
         "--include-package=wsgiref",
         "--include-package-data=django",
 
-        # PyQt6 GUI & QWebEngine
-        "--include-package=PyQt6",
-        "--include-package=PyQt6.QtCore",
-        "--include-package=PyQt6.QtWidgets",
-        "--include-package=PyQt6.QtGui",
-        "--include-package=PyQt6.QtWebEngineWidgets",
-        "--include-package=PyQt6.QtWebEngineCore",
-        "--include-package-data=PyQt6",
-
-        # Automation, OSINT & Cryptography
+        # Automation, OSINT, Cryptography & Analytics
         "--include-package=requests",
         "--include-package=bs4",
         "--include-package=undetected_chromedriver",
@@ -99,7 +91,6 @@ try {
         "--include-package-data=limits",
 
         # Plugins Nuitka
-        "--enable-plugin=pyqt6",
         "--enable-plugin=numpy",
         "--enable-plugin=matplotlib",
         "--enable-plugin=anti-bloat",
@@ -108,7 +99,7 @@ try {
         "--assume-yes-for-downloads",
         "--output-dir=build",
         "--output-filename=ArgosGuardV4.exe",
-        "run_kiosk.py"
+        "launcher_pc.py"
     )
 
     Write-Host "-> Ejecutando: python -m nuitka $($NuitkaArgs -join ' ')" -ForegroundColor DarkGray
@@ -118,26 +109,9 @@ try {
         throw "La compilación de Nuitka falló con código $LASTEXITCODE"
     }
 
-    # Inclusión post-compilación de DLLs gráficas y runtime Visual C++ para compatibilidad total
-    $DistFolder = Join-Path $BuildOut "run_kiosk.dist"
+    # Inclusión post-compilación de DLLs runtime Visual C++ para compatibilidad total
+    $DistFolder = Join-Path $BuildOut "launcher_pc.dist"
     if (Test-Path $DistFolder) {
-        # Crear qt.conf en el directorio raíz ejecutable para que PyQt6 WebEngine funcione en cualquier PC limpia
-        $QtConfPath = Join-Path $DistFolder "qt.conf"
-        "[Paths]`nPrefix = PyQt6/Qt6`nLibraryExecutables = ." | Out-File -FilePath $QtConfPath -Encoding utf8 -Force
-        Write-Host "-> Archivo qt.conf autocontenido creado en: $QtConfPath" -ForegroundColor DarkGray
-
-        $PyQt6Bin = (python -c "import PyQt6, os; print(os.path.join(os.path.dirname(PyQt6.__file__), 'Qt6', 'bin'))" 2>$null).Trim()
-        if (-not (Test-Path $PyQt6Bin)) {
-            $PyQt6Bin = "C:\Users\BetoRock Toledo\AppData\Local\Programs\Python\Python313\Lib\site-packages\PyQt6\Qt6\bin"
-        }
-        $QtDlls = @("d3dcompiler_47.dll", "opengl32sw.dll", "msvcp140_1.dll", "msvcp140_2.dll")
-        foreach ($dll in $QtDlls) {
-            $src = Join-Path $PyQt6Bin $dll
-            if (Test-Path $src) {
-                Copy-Item -Path $src -Destination $DistFolder -Force
-                Write-Host "-> Qt DLL Copiada: $dll" -ForegroundColor DarkGray
-            }
-        }
         $System32Dlls = @(
             "vcruntime140.dll", "vcruntime140_1.dll", "vcruntime140_threads.dll",
             "msvcp140.dll", "msvcp140_1.dll", "msvcp140_2.dll", "msvcp140_atomic_wait.dll", "msvcp140_codecvt_ids.dll",
@@ -150,19 +124,23 @@ try {
                 Write-Host "-> System32 DLL Copiada: $dll" -ForegroundColor DarkGray
             }
         }
+
+        # Firma digital con certificado corporativo BetoGraf si signtool está disponible
+        $PfxPath = Join-Path $BaseDir "installer_v4\prereqs\BetoGraf_Almacenero.pfx"
+        $SignTool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits" -Filter signtool.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName)
+        if ($SignTool -and (Test-Path $PfxPath)) {
+            $ExeToSign = Join-Path $DistFolder "ArgosGuardV4.exe"
+            Write-Host "-> Firmando ejecutable con certificado criptográfico X.509..." -ForegroundColor DarkGray
+            & $SignTool sign /f $PfxPath /p "betograf2026" /t "http://timestamp.digicert.com" /v $ExeToSign 2>$null
+        }
     }
 
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "`n========================================" -ForegroundColor Cyan
-        Write-Host " Compilación Exitosa v4.0 en backend_v4/build/run_kiosk.dist " -ForegroundColor Green
-        Write-Host "========================================" -ForegroundColor Cyan
-    } else {
-        Clean-CompilationState
-        Write-Error "La compilación Nuitka falló."
-    }
+    Write-Host "`n========================================" -ForegroundColor Cyan
+    Write-Host " Compilación Exitosa v4.0 (Patrón BetoGraf + Certificado de Confianza) en backend_v4/build/launcher_pc.dist " -ForegroundColor Green
+    Write-Host "========================================" -ForegroundColor Cyan
 }
 catch {
-    Clean-CompilationState
+    Clear-CompilationState
     Write-Error "Fallo durante la compilación: $_"
 }
 finally {

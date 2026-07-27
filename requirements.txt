@@ -4,9 +4,10 @@ Django>=5.0,<6.0
 asgiref>=3.7.0
 sqlparse>=0.4.4
 
-# GUI & Desktop Kiosk
+# GUI & Desktop Kiosk / Servidor WSGI
 PyQt6>=6.6.0
 PyQt6-WebEngine>=6.6.0
+waitress>=3.0.0
 
 # Criptografía, Hashing & JWT
 cryptography>=41.0.0

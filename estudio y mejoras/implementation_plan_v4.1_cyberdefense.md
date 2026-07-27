@@ -1,95 +1,62 @@
-# Plan de Arquitectura e Implementación v4.1: Resumen OSINT, Módulo IDS e Integración SIEM
+# Plan de Arquitectura v4.1 — Suite de Ciberdefensa Táctica (OSINT PDF Summary + IDS + SIEM + Firma Criptográfica Military-Grade)
 
-Este documento detalla el diseño técnico, la arquitectura y el plan de implementación para las capacidades de ciberdefensa avanzada que se incorporarán en **Argos Guard Enterprise v4.1**, abarcando:
-1. **Botón de Resumen Táctico de Diagnóstico OSINT y Vulnerabilidades** (Generador de informes PDF de riesgo, ataques explotables y guía de hardening).
-2. **Módulo IDS (NIDS / HIDS)** para detección de escaneos de red, suplantación ARP, anomalías y monitoreo de integridad.
-3. **Integración con Herramientas SIEM** (Wazuh API REST, Elastic ECS, Syslog CEF/LEEF para Splunk y Sentinel).
+Este documento contiene las especificaciones técnicas completas de arquitectura y diseño para la versión **v4.1**, incorporando los servicios de Ciberdefensa Táctica (IDS/NIDS/HIDS), Integración SIEM corporativa, Generador de Resumen OSINT en PDF y el blindaje criptográfico de nivel militar mediante certificados X.509.
 
 ---
 
-## 🔍 1. Botón de Resumen Táctico OSINT y Generador de Informes de Riesgo
+## 🔒 1. Blindaje Criptográfico y Certificación X.509 de Nivel Militar
 
-### 1.1 Diseño de UI/UX (Frontend HTMX / Alpine.js)
-- **Ubicación**: En las vistas de inteligencia y diagnóstico (`IntelPanel`), se añade un botón justo debajo de la barra de entrada/botón principal:
-  ```html
-  <button id="btn-osint-summary" 
-          class="btn-cyberpunk-secondary mt-2 w-full"
-          hx-post="/api/v1/osint/report/pdf/"
-          hx-target="#report-download-container">
-      📄 Generar Resumen Táctico de Ciberdefensa (PDF)
-  </button>
-  ```
-- **Comportamiento**: Invoca de forma asíncrona la generación del informe y descarga el archivo PDF directamente en la máquina del cliente sin recargar la página.
+Para garantizar la integridad industrial, confiabilidad del 100% y neutralización total de alertas de falsos positivos en antivirus o Windows SmartScreen en cualquier equipo cliente:
 
-### 1.2 Motor de Evaluación de Riesgos y Hardening (`apps/osint/evaluator.py`)
-El backend procesará el resultado del análisis OSINT a través de tres capas de inteligencia:
-1. **Matriz de Vulnerabilidades (Risk Scoring)**:
-   - Análisis de puertos abiertos (FTP 21, SSH 22, RDP 3389, SMB 445, etc.).
-   - Auditoría de cabeceras HTTP faltantes (HSTS, CSP, X-Frame-Options).
-   - Estado de seguridad DNS (verificación de registros SPF, DMARC, MX).
-2. **Modelado de Vectores de Ataque (Explotabilidad)**:
-   - Traduce los hallazgos técnicos a escenarios de riesgo comprensibles:
-     - *Puertos RDP/SMB expuestos* ➔ *"Vulnerabilidad Crítica: Riesgo de ataques de fuerza bruta o infección por Ransomware"*.
-     - *Ausencia de SPF/DMARC en DNS* ➔ *"Riesgo Alto: Susceptible a suplantación de correo (Email Spoofing / Phishing)"*.
-3. **Plan Táctico de Remedación (Guía de Hardening)**:
-   - Pasos técnicos exactos para mitigar la brecha (ej. comandos de Windows Firewall `netsh`, parches sugeridos y plantillas de registros DNS).
+1. **Inyección y Registro de Certificado de Confianza (`BetoGraf_Almacenero.cer`)**:
+   - Inclusión del certificado digital X.509 en la rutina de instalación de Inno Setup (`installer_v4.iss`).
+   - Comando desatendido: `certutil -user -f -addstore Root "{tmp}\BetoGraf_Almacenero.cer"` ejecutado durante la instalación.
+   - Otorga estatus de software de confianza registrado en el almacén de raíces del sistema host.
+
+2. **Firma Digital Criptográfica de Código (`signtool.exe`)**:
+   - Firma digital automatizada con el archivo de certificado de clave privada `.pfx` (`BetoGraf_Almacenero.pfx`) y sello de tiempo de la autoridad Certum/DigiCert (`http://timestamp.digicert.com`).
+   - Firma aplicada quirúrgicamente sobre el binario ejecutable compilado `ArgosGuardV4.exe` y sobre el instalador final `ArgosGuard_Installer_v4.0.0.exe`.
 
 ---
 
-## 🛡️ 2. Módulo IDS (Intrusion Detection System)
+## 📑 2. Módulo A: Botón "Resumen Táctico OSINT" & Reporte Executivo PDF
 
-### 2.1 Motor NIDS (Detección Basada en Red - `apps/security/nids.py`)
-- **Detector de Escaneos de Red (Port Scan & Sweep Detector)**:
-  - Rastrea la frecuencia de SYN/ICMP recibidos. Si una IP interactúa con más de 10 puertos en menos de 5 segundos, la clasifica como `Scanning Attack`.
-- **Detector de ARP Spoofing / Man-In-The-Middle (MITM)**:
-  - Inspección periódica de la tabla ARP local (`arp -a`) comparando la MAC de la Puerta de Enlace contra registros históricos para alertar envenenamiento ARP.
-- **Detector de Anomalías de Tráfico y DDoS**:
-  - Detección de picos inusuales de latencia y ráfagas ICMP/TCP.
-
-### 2.2 Motor HIDS (Detección Basada en Host - `apps/security/hids.py`)
-- **Monitoreo de Integridad de Archivos (FIM - File Integrity Monitoring)**:
-  - Verificación periódica de hashes SHA-256 sobre archivos críticos (`ArgosGuardV4.exe`, DLLs, `argos_guard_v4.db`).
-- **Auditoría de Inicios de Sesión**:
-  - Registro de intentos fallidos repetidos en la consola táctica.
-
-### 2.3 Respuesta Activa (IPS Response)
-- **Aislamiento Táctico de IP**: Opción para ejecutar bloqueo en Windows Firewall:
-  ```powershell
-  netsh advfirewall firewall add rule name="ArgosGuard_Block_IP" dir=in action=block remoteip=X.X.X.X
-  ```
-- **Alertas Omnicanal**: Toasts sonoros/visuales en el Kiosko y notificaciones automáticas a Telegram.
+- **Interfaz Táctica**: Botón `📄 Resumen Táctico` ubicado bajo el cuadro de búsqueda principal de la Pestaña OSINT (`templates/osint/osint.html`).
+- **Comportamiento Asíncrono**: Despacho de escaneo completo de vulnerabilidades web (encabezados de seguridad CSP/HSTS/X-Frame, puertos abiertos expuestos, fugas DNS y certificados SSL/TLS).
+- **Generador de Reporte PDF (fpdf2)**:
+  - Exportación automática a la carpeta `Descargas` del usuario host.
+  - Matriz de Vectores de Ataque Explotables (Phishing, Man-in-the-Middle, RDP Brute Force, Exposición de Servicios).
+  - Recomendaciones de Hardening accionables categorizadas por nivel de severidad (Crítica, Alta, Media, Informativa).
 
 ---
 
-## 📊 3. Integración con Herramientas SIEM
+## 🛡️ 3. Módulo B: Sistema de Detección de Intrusos (IDS / NIDS / HIDS)
 
-### 3.1 Conector Bidireccional Wazuh API REST (`apps/security/wazuh_connector.py`)
-- Envío de eventos de Argos Guard a Wazuh Manager en formato JSON/Syslog.
-- Consulta de alertas del SOC desde Wazuh API REST para desplegarlas en la pantalla táctica de Argos Guard.
-
-### 3.2 Exportador Elastic SIEM / ECS Format (`apps/core/log_exporter.py`)
-- Mapeo de eventos al formato **Elastic Common Schema (ECS)** para ingesta nativa en Elasticsearch / Kibana / Logstash.
-
-### 3.3 Emisor Syslog Estándar (CEF / LEEF)
-- Emisión Syslog RFC 5424 (UDP/TCP/TLS) en formato **CEF (Common Event Format)** para integración universal con **Splunk**, **IBM QRadar**, **FortiSIEM** o **Microsoft Sentinel**.
+1. **NIDS (Network Intrusion Detection System)**:
+   - **Detección de Port Scanning**: Sensor de inspección de densidad de conexiones TCP SYN / FIN / NULL en ventanas cortas de tiempo (detección de escaneos masivos Nmap/Masscan).
+   - **Detección de ARP Spoofing / MITM**: Guardián de tabla ARP que detecta duplicidad de direcciones MAC o cambios repentinos de la MAC del Gateway predeterminado.
+   - **ICMP Flood Detection**: Telemetría anti-DDoS de paquetes eco masivos.
+2. **HIDS (Host Intrusion Detection System)**:
+   - **FIM (File Integrity Monitoring)**: Hash SHA-256 periódico del ejecutable del sistema `ArgosGuardV4.exe` y la base de datos `argos_v4.db` contra firmas criptográficas maestras guardadas al compilar.
+3. **Respuesta Activa (IPS)**:
+   - Capacidad opcional para añadir reglas de bloqueo inmediato en el Firewall de Windows (`netsh advfirewall firewall add rule name="ArgosGuard_Block_IP" dir=in action=block remoteip=X.X.X.X`).
 
 ---
 
-## 🗓️ Roadmap de Implementación Sugerido (Versión v4.1)
+## 📊 4. Módulo C: Integración con Herramientas SIEM
 
-```mermaid
-flowchart TD
-    A["V4.0 Release Actual (100% Estable)"] --> B["Fase 1: Botón Resumen OSINT & Generador PDF"]
-    B --> C["Fase 2: Motor de Vulnerabilidades, Ataques & Hardening"]
-    C --> D["Fase 3: Módulo IDS (NIDS PortScan/ARP & HIDS FIM)"]
-    D --> E["Fase 4: Conectores SIEM (Wazuh API & Syslog CEF)"]
-    E --> F["Fase 5: Suite de Pruebas & Release v4.1"]
-```
+1. **Conector Wazuh (REST API v4.x)**:
+   - Integración nativa bidireccional mediante `WazuhAPIClient` con autenticación JWT Bearer.
+   - Envío de eventos de seguridad y sincronización de agentes activos.
+2. **Exportador Elastic SIEM / ECS JSON**:
+   - Formateador de eventos en estándar **Elastic Common Schema (ECS 8.x)** listo para ingesta en Elasticsearch, Logstash o Kibana.
+3. **Emisor Syslog CEF / LEEF (Splunk & Microsoft Sentinel)**:
+   - Soporte de transporte UDP/TCP Syslog transmitiendo en formato CEF (Common Event Format para Splunk y Micro Focus ArcSight) y LEEF (Log Event Extended Format para IBM QRadar).
 
-| Fase | Alcance | Archivos a Modificar / Crear |
-|---|---|---|
-| **Fase 1** | Botón `📄 Resumen Táctico` y plantilla PDF en OSINT | `apps/osint/views.py`, `templates/osint/` |
-| **Fase 2** | Motor de Análisis de Riesgos, Vectores de Ataque y Remedación | `apps/osint/evaluator.py` |
-| **Fase 3** | Motor NIDS (Port Scan, ARP Spoofing) y HIDS (File Integrity) | `apps/security/nids.py`, `apps/security/hids.py` |
-| **Fase 4** | Integración Wazuh API REST y Emisor Syslog CEF | `apps/security/wazuh_connector.py` |
-| **Fase 5** | Suite de Pruebas (`pytest`, `k6`) y Empaquetado v4.1 | Monolito completo |
+---
+
+## 🧪 Plan de Verificación de Integridad
+
+- **Pruebas Unitarias (`pytest`)**: Cobertura del 100% sobre conectores SIEM, firmas FIM y generador PDF.
+- **Pruebas de Estrés (`k6`)**: Ingesta masiva simulada de alertas IDS sin pérdida de paquetes.
+- **Verificación de Firma**: Comprobación con `Get-AuthenticodeSignature` en PowerShell.

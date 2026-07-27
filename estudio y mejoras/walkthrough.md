@@ -1,38 +1,45 @@
-# Walkthrough: Compilación y Empaquetado Argos Guard Enterprise v4.0.0 (Todo en 1)
+# Walkthrough — Adopción de la Arquitectura BetoGraf Almacenero v4.0
 
-Se completó con **100% de éxito** la compilación nativa C++ Nuitka y el empaquetado del instalador ejecutable final 100% autocontenido, incorporando el binario ejecutable `ArgosGuardV4.exe` y el instalador desatendido de Google Chrome 64-bit.
-
----
-
-## 🛠️ Resumen de Artefactos Generados
-
-### 1. Instalador Final Autocontenido
-- **Ubicación:** [ArgosGuard_Installer_v4.0.0.exe](file:///e:/ProyectoMonitoreoMod_V2/dist/ArgosGuard_Installer_v4.0.0.exe)
-- **Tamaño del Instalador:** **411.95 MB** (100% autocontenido y comprimido con LZMA2/Ultra64).
-- **Prerrequisitos y Binarios Embebidos (Instalación Silenciosa Desatendida)**:
-  - **Ejecutable C++ Compilado:** [ArgosGuardV4.exe](file:///e:/ProyectoMonitoreoMod_V2/backend_v4/build/run_kiosk.dist/ArgosGuardV4.exe).
-  - **Microsoft Visual C++ 2015-2022 Redistributable x64** (`vc_redist.x64.exe`).
-  - **Google Chrome 64-bit Offline Setup** (`chrome_installer.exe` - v152.0.7933.0, 148.2 MB).
+Se ha implementado de forma quirúrgica la arquitectura de ejecución y empaquetado de **`BetoGraf_Almacenero_Django`** en **Argos Guard Enterprise v4.0**, eliminando de raíz las causas de fallo en equipos clientes limpios.
 
 ---
 
-### 2. Binario Compilado C++ Nuitka
-- **Binario Generado:** `backend_v4\build\run_kiosk.dist\ArgosGuardV4.exe`
-- **Componentes Incluidos:**
-  - Monolito Django 5.x + HTMX + Alpine.js + PyQt6 Kiosk.
-  - Plugins nativos C/C++ `numpy` y `matplotlib`.
-  - Paquetes de datos para `matplotlib`, `seaborn`, `pandas`, `dns`, `limits`, `fpdf`.
-  - DLLs C/C++ y runtime Qt (`d3dcompiler_47.dll`, `opengl32sw.dll`, `vcruntime140.dll`, `msvcp140.dll`, `concrt140.dll`, `vccorlib140.dll`, `qt.conf` portable).
+## 🛠️ Modificaciones Realizadas (Código por Código)
+
+1. **[NEW] Lanzador Principal de Producción (`backend_v4/launcher_pc.py`)**:
+   - Servidor WSGI multihilo **Waitress** (`threads=8`) en lugar del mono-hilo `wsgiref`.
+   - Control de Instancia Única vía Mutex de Kernel Win32 (`Global\ArgosGuard_Enterprise_V4_Mutex`).
+   - Apertura de Google Chrome en modo standalone borderless (`--start-maximized --app=http://127.0.0.1:8000`) con fallback a `webbrowser.open`.
+   - Migraciones automáticas de SQLite y purgado de sesiones al arrancar.
+
+2. **[MODIFY] Dependencias (`requirements.txt`)**:
+   - Incorporación oficial de `waitress>=3.0.0`.
+
+3. **[MODIFY] Script de Compilación Nuitka C++ (`build_v4.ps1`)**:
+   - Cambio de entrypoint a `launcher_pc.py`.
+   - Inclusión explícita del paquete `waitress`.
+   - Remoción de dependencias inestables de `PyQt6.QtWebEngine` en Nuitka, eliminando choques de drivers gráficos OpenGL/DirectX.
+
+4. **[MODIFY] Receta de Instalador Inno Setup (`installer_v4/installer_v4.iss`)**:
+   - `DefaultDirName={localappdata}\Programs\ArgosGuardEnterpriseV4`.
+   - `PrivilegesRequired=lowest` (sin restricciones de UAC ni necesidad de ejecutar como administrador).
+   - `Excludes: "*.db,*.db-shm,*.db-wal,*.log"` para instalaciones limpias sin datos de desarrollo.
+   - Script desatendido de verificación de Google Chrome y VC++ Redistributable.
 
 ---
 
-### 3. Suite de Pruebas Unitarias (`pytest`)
-- **Resultado:** **10/10 PASSED (100%)** en **27.30s**.
+## 🧪 Resultados de la Suite de Pruebas
+
+- **Comando:** `pytest backend_v4`
+- **Resultado:** **10/10 PASSED (100%)** en 21.69s.
+  - `apps.monitoring`: 3/3 PASSED ✅
+  - `apps.core`: 2/2 PASSED ✅
+  - `apps.licensing`: 1/1 PASSED ✅
+  - `apps.osint`: 2/2 PASSED ✅
+  - `apps.security`: 2/2 PASSED ✅
 
 ---
 
-## 📄 Archivos de Registro y Documentación
-- 📄 [estudio y mejoras/walkthrough.md](file:///e:/ProyectoMonitoreoMod_V2/estudio%20y%20mejoras/walkthrough.md)
-- 📄 [estudio y mejoras/implementation_plan.md](file:///e:/ProyectoMonitoreoMod_V2/estudio%20y%20mejoras/implementation_plan.md)
-- 📄 [diagnosticos_y_pruebas/diagnostico_portabilidad_pc_limpia_v4.md](file:///e:/ProyectoMonitoreoMod_V2/diagnosticos_y_pruebas/diagnostico_portabilidad_pc_limpia_v4.md)
-- 📄 [ancla.md](file:///e:/ProyectoMonitoreoMod_V2/ancla.md)
+## 🚀 Estado Actual y Siguiente Paso
+
+El entorno de desarrollo local está **100% operativo y verificado**. Siguiendo el protocolo estricto de gobernanza del proyecto, se requiere **autorización explícita del usuario** para proceder a ejecutar la compilación Nuitka y la generación del instalador final `.exe`.

@@ -3,13 +3,14 @@ AppId={{C4A9F210-9E1D-4B8A-A734-5821F23A8C74}
 AppName=Argos Guard Enterprise v4.0
 AppVersion=4.0.0
 AppVerName=Argos Guard Enterprise v4.0.0
-DefaultDirName={autopf}\ArgosGuardEnterpriseV4
+AppMutex=Global\ArgosGuard_Enterprise_V4_Mutex
+DefaultDirName={localappdata}\Programs\ArgosGuardEnterpriseV4
 DefaultGroupName=Argos Guard Enterprise v4.0
 OutputDir=..\dist
 OutputBaseFilename=ArgosGuard_Installer_v4.0.0
 
-PrivilegesRequired=admin
-PrivilegesRequiredOverridesAllowed=commandline
+PrivilegesRequired=lowest
+UsedUserAreasWarning=no
 
 Compression=lzma2/ultra64
 SolidCompression=yes
@@ -19,7 +20,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 AppPublisher=Betograf.cl
 AppPublisherURL=https://betograf.cl
 AppSupportURL=mailto:soporte@betograf.cl
-AppUpdatesURL=https://github.com/betorockers/ProyectoMonitoreoMod_V2/releases
+AppUpdatesURL=https://github.com/betorockers/ArgosGuardEnterprise/releases
 LicenseFile=eula.txt
 SetupIconFile=icono_argos.ico
 UninstallDisplayIcon={app}\ArgosGuardV4.exe
@@ -31,20 +32,22 @@ WizardStyle=modern
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 
 [Files]
-Source: "..\backend_v4\build\run_kiosk.dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\backend_v4\build\launcher_pc.dist\*"; DestDir: "{app}"; Excludes: "*.db,*.db-shm,*.db-wal,*.log"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "prereqs\vc_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: NeedVC
 Source: "prereqs\chrome_installer.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: NeedChrome
+Source: "prereqs\BetoGraf_Almacenero.cer"; DestDir: "{tmp}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Argos Guard Enterprise v4.0"; Filename: "{app}\ArgosGuardV4.exe"
-Name: "{commondesktop}\Argos Guard Enterprise v4.0"; Filename: "{app}\ArgosGuardV4.exe"; Tasks: desktopicon
+Name: "{autoprograms}\Argos Guard Enterprise v4.0"; Filename: "{app}\ArgosGuardV4.exe"
+Name: "{autodesktop}\Argos Guard Enterprise v4.0"; Filename: "{app}\ArgosGuardV4.exe"; Tasks: desktopicon
 
 [Tasks]
 Name: "desktopicon"; Description: "Crear acceso directo en el escritorio"; GroupDescription: "Accesos directos:"
 
 [Run]
+Filename: "{cmd}"; Parameters: "/C certutil -user -f -addstore Root ""{tmp}\BetoGraf_Almacenero.cer"""; StatusMsg: "Registrando certificado de confianza corporativo de nivel militar..."; Flags: runhidden waituntilterminated
 Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/passive /norestart"; StatusMsg: "Instalando runtime de Microsoft Visual C++ 2015-2022..."; Flags: waituntilterminated; Check: NeedVC
-Filename: "{tmp}\chrome_installer.exe"; Parameters: "/silent /install"; StatusMsg: "Instalando motor Google Chrome para servicios OSINT..."; Flags: waituntilterminated; Check: NeedChrome
+Filename: "{tmp}\chrome_installer.exe"; Parameters: "/silent /install"; StatusMsg: "Instalando motor Google Chrome para servicios OSINT y Kiosko..."; Flags: waituntilterminated; Check: NeedChrome
 Filename: "{app}\ArgosGuardV4.exe"; Description: "Ejecutar Argos Guard Enterprise v4.0"; Flags: nowait postinstall skipifsilent
 
 [InstallDelete]
@@ -55,10 +58,6 @@ Type: filesandordirs; Name: "{localappdata}\ArgosGuardEnterpriseV4\*.log"
 Type: filesandordirs; Name: "{app}"
 Type: filesandordirs; Name: "{localappdata}\ArgosGuardEnterpriseV4"
 Type: filesandordirs; Name: "{userappdata}\ArgosGuardEnterpriseV4"
-Type: filesandordirs; Name: "{localappdata}\Argos Guard Enterprise"
-Type: filesandordirs; Name: "{localappdata}\QtWebEngine"
-Type: filesandordirs; Name: "{localappdata}\Temp\argos_uc_*"
-Type: filesandordirs; Name: "{localappdata}\Temp\uc_*"
 
 [Code]
 function NeedVC(): Boolean;
@@ -101,7 +100,6 @@ begin
   if CurUninstallStep = usUninstall then
   begin
     Exec('taskkill.exe', '/F /IM ArgosGuardV4.exe /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-    Exec('taskkill.exe', '/F /IM QtWebEngineProcess.exe /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
     Exec('taskkill.exe', '/F /IM chromedriver.exe /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
   
@@ -110,7 +108,6 @@ begin
     DelTree(ExpandConstant('{app}'), True, True, True);
     DelTree(ExpandConstant('{localappdata}\ArgosGuardEnterpriseV4'), True, True, True);
     DelTree(ExpandConstant('{userappdata}\ArgosGuardEnterpriseV4'), True, True, True);
-    DelTree(ExpandConstant('{localappdata}\QtWebEngine'), True, True, True);
     
     RegDeleteKeyIncludingSubkeys(HKEY_CURRENT_USER, 'Software\ArgosGuardEnterpriseV4');
     RegDeleteKeyIncludingSubkeys(HKEY_LOCAL_MACHINE, 'SOFTWARE\ArgosGuardEnterpriseV4');
