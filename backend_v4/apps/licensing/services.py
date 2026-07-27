@@ -9,7 +9,8 @@ def get_system_hwid() -> str:
     """Genera una huella digital única HWID para la máquina host Air-Gapped."""
     try:
         if platform.system() == "Windows":
-            output = subprocess.check_output("wmic csproduct get uuid", shell=True).decode()
+            flags = getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)
+            output = subprocess.check_output("wmic csproduct get uuid", shell=True, creationflags=flags).decode()
             lines = [line.strip() for line in output.split("\n") if line.strip()]
             if len(lines) >= 2:
                 return lines[1]

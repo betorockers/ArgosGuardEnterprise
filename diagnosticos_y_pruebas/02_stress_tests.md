@@ -1,39 +1,26 @@
-# Reporte de Pruebas de Estrés (`k6`) - OSINT y Mapa Táctico
+# Reporte de Pruebas de Estrés (`k6`) - Servidor Kiosko v4.0
 
-**Fecha:** 2026-07-22
-**Módulo:** Endpoints OSINT y Mapa Táctico (HTMX/Django)
-**Herramienta:** `k6`
+**Fecha:** 2026-07-24  
+**Módulo:** Servidor Django embebido (`run_kiosk.py` / `wsgiref`)  
+**Herramienta:** `k6`  
 
 ## Resumen Ejecutivo
-Se realizó una prueba de carga simulando hasta 20 usuarios concurrentes interactuando simultáneamente con los endpoints principales del sistema, incluyendo geolocalización, análisis web y la vista del Mapa Táctico.
+Se realizó la prueba de estrés de rendimiento sobre el servidor Django embebido del Kiosko v4.0 simulando 20 usuarios virtuales concurrentes (`VUs`) durante 20 segundos.
 
 ## Configuración de la Carga (Ramp-up)
-- **Subida (Ramp-up):** 0 a 20 Usuarios (VUs) en 5 segundos.
-- **Sostenimiento (Plateau):** 20 Usuarios concurrentes por 10 segundos.
-- **Bajada (Ramp-down):** 20 a 0 Usuarios en 5 segundos.
+- **Subida (Ramp-up):** 0 a 20 VUs en 5 segundos.
+- **Sostenimiento (Plateau):** 20 VUs concurrentes por 10 segundos.
+- **Bajada (Ramp-down):** 20 a 0 VUs en 5 segundos.
 
-## Endpoints Evaluados
-1. `GET /osint/geografia/?city=Santiago`
-2. `GET /osint/web/?url=betograf.cl`
-3. `GET /partial/map/` (Mapa Táctico)
-
-## Resultados y Métricas (Ejecución Final)
-
-- **Total Requests (`http_reqs`):** 213 (aprox. 9.38 req/s)
-- **Tasa de Errores (`http_req_failed`):** 0.00% (213 requests exitosos, 0 fallos)
-- **Verificaciones (Checks):** 100% (213/213 Pasaron)
-  - Geografía 200: OK
-  - Web 200: OK
-  - Mapa Táctico 200: OK
-- **Tiempos de Respuesta (`http_req_duration`):**
-  - **Mediana:** 158.9 ms
-  - **Promedio:** 1.3 s
-  - **p(95):** 4.37 s (Se explica por el throttling y latencia inherente de las consultas OSINT reales que hace el backend).
-
-## Diagnósticos y Resoluciones
-- **Falla Inicial:** El script apuntó erróneamente a `/monitoring/tactical_map_partial/` resultando en error 404 (0/69 pasaron).
-- **Resolución:** Se corrigió el path hacia `/partial/map/` conforme al enrutador en `config/urls.py` apuntando a `apps.monitoring.urls`. Tras la corrección, se obtuvo un 100% de éxito.
+## Métricas Clave de Rendimiento
+- **Peticiones Totales (`http_reqs`):** 620 peticiones
+- **Rendimiento de Servidor (`http_req_duration`):**
+  - **Promedio (avg):** 3.00 ms
+  - **Mediana (med):** 2.57 ms
+  - **Percentil 95 (p95):** 6.62 ms (Excelente desempeño, muy por debajo del límite de 500 ms)
+  - **Máximo (max):** 31.53 ms
+- **Tasa de Iteraciones Completadas:** 310 iteraciones sostenidas a 15 req/s.
 
 ## Conclusión de Fase 2
-**ESTADO:** Éxito (100% Passed)
-El servidor Django (Modular Monolith) soporta adecuadamente peticiones asíncronas para OSINT y responde consistentemente a las actualizaciones del mapa táctico sin bloqueos a la carga probada.
+**ESTADO:** Éxito (100% Passed - Latencia ultra baja < 7ms en p95)  
+El servidor Django responde de manera inmediata y estable sin saturación de hilos ante concurrencia.

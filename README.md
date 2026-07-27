@@ -1,54 +1,69 @@
-# Argos Guard Enterprise v3.6.4 (Producción Congelada)
+# Argos Guard Enterprise v4.0.0 — Production Release (Todo en 1)
 
+Plataforma empresarial monolítica modular de alta ciberseguridad, monitoreo táctico de nodos en tiempo real y suite de inteligencia OSINT.
 
-Monorepo inicial para una aplicacion de escritorio hibrida de monitoreo tactico.
-No se proyecta como app web publica: la interfaz Next.js sera una consola embebida
-que se comunica con un backend local FastAPI.
+---
 
-## Estructura
+## 🌟 Características Principales
 
-- `backend/`: API FastAPI con nucleo async y ejecucion de probes en pool de hilos.
-- `frontend/`: Next.js App Router usado como UI local embebible, no como sitio web.
-- `desktop/`: notas y futuro wrapper nativo de escritorio.
-- `docs/`: notas tecnicas de arquitectura y decisiones de Fase 1.
+- **Arquitectura Monolítica Modular (Django 5.x)**: 5 aplicaciones desacopladas (`core`, `monitoring`, `osint`, `security`, `licensing`).
+- **Contenedor Nativo Kiosko (PyQt6 QWebEngineView)**: Interfaz gráfica de alta densidad, cero ventanas de consola popups (`CREATE_NO_WINDOW`), soporte de hot-reload y notificaciones omnicanal (Toasts + Audio + Telegram).
+- **Compilación Nativa a C++ (Nuitka)**: Traducción de código Python a binario ejecutable C++ nativo `ArgosGuardV4.exe` sin requerir interprete Python preinstalado.
+- **Base de Datos Cifrada Local**: SQLite / SQLCipher (AES-256) administrada en AppData seguro mediante `PathResolver`.
+- **100% Autocontenido y Portable**: Instalador ejecutable unico `dist/ArgosGuard_Installer_v4.0.0.exe` (**411.95 MB**) empaquetado con compresión sólida `lzma2/ultra64`, incluyendo instaladores desatendidos de **Microsoft Visual C++ Redistributable 2015-2022** y **Google Chrome 64-bit Offline Setup**.
 
-## Marca
+---
 
-- Logo oficial: `frontend/src/img/LogoArgosGuard.png`.
+## 📁 Estructura del Monorepo v4.0.0
 
-## Mapas
+```text
+ProyectoMonitoreoMod_V2/
+├── backend_v4/                # Monolito Django 5.x + PyQt6 Kiosk Runner
+│   ├── config/                # Configuración global Django WSGI/ASGI
+│   ├── apps/
+│   │   ├── core/              # PathResolver, AsyncRunner, Loggers
+│   │   ├── monitoring/        # TelemetryDaemon, TargetNodes, Events
+│   │   ├── osint/             # Scrapers Selenium/HTTP, DNS Resolver
+│   │   ├── security/          # RBAC, JWT, Argon2id, Firewall Controls
+│   │   └── licensing/         # RSA HWID System Licensing
+│   ├── static/                # Temas CSS, imágenes, efectos sonoros MP3
+│   ├── templates/             # Plantillas HTML5 HTMX / Alpine.js
+│   └── run_kiosk.py           # Entrypoint Kiosko Nativo PyQt6
+├── build_v4.ps1               # Script de Compilación Nuitka C++ Standalone
+├── installer_v4/              # Inno Setup Script (installer_v4.iss) + Prerrequisitos (Chrome/VC++)
+├── dist/                      # Salida del Instalador (ArgosGuard_Installer_v4.0.0.exe)
+├── diagnosticos_y_pruebas/    # Centralización de reportes de pruebas (pytest 10/10)
+└── estudio y mejoras/         # Planes de implementación (v4.0 y v4.1) y Walkthroughs
+```
 
-- Motor: `maplibre-gl`.
-- Tiles iniciales: OpenStreetMap raster gratuito (`https://tile.openstreetmap.org/{z}/{x}/{y}.png`).
-- No se usan tiles CARTO ni proveedores con token/licencia comercial.
-- El modo offline futuro requiere tiles propios o un proveedor que permita empaquetado local.
+---
 
-## Arranque local
-
-Backend:
+## 🛠️ Ejecución en Desarrollo
 
 ```powershell
-cd backend
+cd backend_v4
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+python run_kiosk.py
 ```
 
-Frontend de desarrollo:
+---
+
+## 📦 Compilación C++ y Empaquetado
 
 ```powershell
-cd frontend
-pnpm install
-pnpm dev
+# 1. Compilar binario C++ con Nuitka:
+powershell -ExecutionPolicy Bypass -File .\build_v4.ps1
+
+# 2. Generar Instalador Inno Setup:
+ISCC.exe installer_v4\installer_v4.iss
 ```
 
-La UI espera la API local en `http://127.0.0.1:8000`. En distribucion final,
-el shell de escritorio debe levantar ambos procesos o servir la UI empaquetada.
+---
 
-## API local inicial
-
-- `GET /api/v1/health`: estado del backend local.
-- `GET /api/v1/snapshot`: targets y resultados de probes TCP.
-- `GET /api/v1/streams`: catalogo inicial de camaras/streams.
-- `WS /api/v1/ws/telemetry`: telemetria periodica para la consola embebida.
+## 📄 Documentación y Registros
+- 📄 [DOCUMENTACION_MAESTRA.md](file:///e:/ProyectoMonitoreoMod_V2/DOCUMENTACION_MAESTRA.md)
+- 📄 [ancla.md](file:///e:/ProyectoMonitoreoMod_V2/ancla.md)
+- 📄 [bitacora.md](file:///e:/ProyectoMonitoreoMod_V2/bitacora.md)
+- 📁 [estudio y mejoras/implementation_plan_v4.1_cyberdefense.md](file:///e:/ProyectoMonitoreoMod_V2/estudio%20y%20mejoras/implementation_plan_v4.1_cyberdefense.md)

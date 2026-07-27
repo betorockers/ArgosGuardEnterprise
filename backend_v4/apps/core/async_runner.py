@@ -18,10 +18,12 @@ class NetworkProbeRunner:
         import re
         if platform.system().lower() == 'windows':
             try:
+                extra = {'creationflags': 0x08000000} if platform.system().lower() == 'windows' else {}
                 proc = await asyncio.create_subprocess_exec(
                     'arp', '-a', host,
                     stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE
+                    stderr=asyncio.subprocess.PIPE,
+                    **extra
                 )
                 stdout, _ = await proc.communicate()
                 output = stdout.decode('cp850', errors='ignore')
@@ -69,10 +71,12 @@ class NetworkProbeRunner:
             timeout_val = '2000' if platform.system().lower() == 'windows' else '2'
             
             try:
+                extra = {'creationflags': 0x08000000} if platform.system().lower() == 'windows' else {}
                 proc = await asyncio.create_subprocess_exec(
                     'ping', param, '1', timeout_param, timeout_val, host,
                     stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE
+                    stderr=asyncio.subprocess.PIPE,
+                    **extra
                 )
                 stdout, stderr = await proc.communicate()
                 

@@ -25,16 +25,15 @@ SetupIconFile=icono_argos.ico
 UninstallDisplayIcon={app}\ArgosGuardV4.exe
 WizardImageFile=cyberpunk_side.bmp
 WizardSmallImageFile=icono_argos.bmp
-WizardStyle=modern dark
+WizardStyle=modern
 
 [Languages]
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 
 [Files]
 Source: "..\backend_v4\build\run_kiosk.dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Windows\System32\vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall
-Source: "C:\Windows\System32\vcruntime140_1.dll"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall
-Source: "C:\Windows\System32\msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion uninsneveruninstall
+Source: "prereqs\vc_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: NeedVC
+Source: "prereqs\chrome_installer.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: NeedChrome
 
 [Icons]
 Name: "{group}\Argos Guard Enterprise v4.0"; Filename: "{app}\ArgosGuardV4.exe"
@@ -44,6 +43,8 @@ Name: "{commondesktop}\Argos Guard Enterprise v4.0"; Filename: "{app}\ArgosGuard
 Name: "desktopicon"; Description: "Crear acceso directo en el escritorio"; GroupDescription: "Accesos directos:"
 
 [Run]
+Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/passive /norestart"; StatusMsg: "Instalando runtime de Microsoft Visual C++ 2015-2022..."; Flags: waituntilterminated; Check: NeedVC
+Filename: "{tmp}\chrome_installer.exe"; Parameters: "/silent /install"; StatusMsg: "Instalando motor Google Chrome para servicios OSINT..."; Flags: waituntilterminated; Check: NeedChrome
 Filename: "{app}\ArgosGuardV4.exe"; Description: "Ejecutar Argos Guard Enterprise v4.0"; Flags: nowait postinstall skipifsilent
 
 [InstallDelete]
@@ -85,7 +86,8 @@ begin
   ChromeInstalled := RegKeyExists(HKEY_LOCAL_MACHINE, UninstallKey) or RegKeyExists(HKEY_CURRENT_USER, UninstallKey);
   if not ChromeInstalled then
   begin
-    ChromeInstalled := FileExists(ExpandConstant('{pf}\Google\Chrome\Application\chrome.exe')) or
+    ChromeInstalled := FileExists(ExpandConstant('{app}\chrome\chrome.exe')) or
+              FileExists(ExpandConstant('{pf}\Google\Chrome\Application\chrome.exe')) or
               FileExists(ExpandConstant('{pf32}\Google\Chrome\Application\chrome.exe')) or
               FileExists(ExpandConstant('{localappdata}\Google\Chrome\Application\chrome.exe'));
   end;

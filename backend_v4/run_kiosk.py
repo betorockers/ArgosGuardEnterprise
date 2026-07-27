@@ -40,12 +40,25 @@ def get_free_port() -> int:
 
 def run_django_server(port: int):
     """Ejecuta el servidor WSGI de Django en el hilo secundario con soporte de archivos estáticos."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
-    from django.core.wsgi import get_wsgi_application
-    from django.contrib.staticfiles.handlers import StaticFilesHandler
-    from wsgiref.simple_server import make_server
-
     try:
+        log_msg("Inicializando Django settings y setup...")
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+        import django
+        django.setup()
+
+        # Ejecutar migraciones automáticas de base de datos al arrancar
+        try:
+            log_msg("Ejecutando migraciones automáticas de base de datos...")
+            from django.core.management import call_command
+            call_command('migrate', interactive=False)
+            log_msg("Migraciones ejecutadas con éxito.")
+        except Exception as e:
+            log_msg(f"Advertencia al ejecutar migraciones automáticas: {e}")
+
+        from django.core.wsgi import get_wsgi_application
+        from django.contrib.staticfiles.handlers import StaticFilesHandler
+        from wsgiref.simple_server import make_server
+
         app = StaticFilesHandler(get_wsgi_application())
         
         # Purgar sesiones antiguas de Django para garantizar inicio en limpio
@@ -60,7 +73,7 @@ def run_django_server(port: int):
         log_msg(f"Servidor Django iniciado exitosamente en http://127.0.0.1:{port}/")
         httpd.serve_forever()
     except Exception as e:
-        log_msg(f"ERROR en Servidor Django: {traceback.format_exc()}")
+        log_msg(f"ERROR FATAL en Servidor Django: {traceback.format_exc()}")
 
 def wait_for_server(port: int, timeout: float = 10.0) -> bool:
     """Realiza una espera activa en bucle para confirmar que el puerto esté abierto."""
@@ -77,20 +90,9 @@ def kill_zombie_processes():
     """Destruye procesos huérfanos de ejecuciones previas del Kiosko."""
     if os.name == 'nt':
         import subprocess
-        current_pid = os.getpid()
         try:
-            # Eliminar otros python.exe corriendo run_kiosk.py
-            cmd = 'wmic process where "name=\'python.exe\' and commandline like \'%run_kiosk%\'" get processid'
-            output = subprocess.check_output(cmd, shell=True, text=True)
-            for line in output.splitlines():
-                line = line.strip()
-                if line.isdigit():
-                    pid = int(line)
-                    if pid != current_pid:
-                        subprocess.run(f"taskkill /F /PID {pid}", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            
-            # Eliminar subprocesos zombis de WebEngine (es seguro en un kiosko dedicado)
-            subprocess.run("taskkill /F /IM QtWebEngineProcess.exe", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            flags = getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)
+            subprocess.run("taskkill /F /IM QtWebEngineProcess.exe", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=flags)
         except Exception as e:
             log_msg(f"Advertencia al limpiar zombies: {e}")
 
@@ -104,10 +106,19 @@ def main():
     server_thread.start()
 
     log_msg(f"2. Esperando confirmación de socket en puerto {port}...")
-    if not wait_for_server(port, timeout=12.0):
+    if not wait_for_server(port, timeout=35.0):
         log_msg("CRITICAL: El servidor Django no respondió a tiempo.")
+        err_detail = ""
+        try:
+            log_file = resolver.get_app_data_path("kiosk_engine.log")
+            if log_file.exists():
+                lines = log_file.read_text(encoding="utf-8").splitlines()[-10:]
+                err_detail = "\n\nDetalle de diagnóstico:\n" + "\n".join(lines)
+        except Exception:
+            pass
         if os.name == 'nt':
-            ctypes.windll.user32.MessageBoxW(0, "Error crítico de inicialización:\n\nEl servidor interno de Argos Guard no pudo iniciar en el tiempo límite.", "Error Fatal - Argos Guard v4.0", 0x10)
+            msg = f"Error crítico de inicialización:\n\nEl servidor interno de Argos Guard no pudo iniciar en el tiempo límite (35s).{err_detail}"
+            ctypes.windll.user32.MessageBoxW(0, msg, "Error Fatal - Argos Guard v4.0", 0x10)
         sys.exit(1)
 
     url = f"http://127.0.0.1:{port}/"

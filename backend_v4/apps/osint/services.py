@@ -26,7 +26,21 @@ def format_rut_with_dots(rut_raw: str) -> str:
     return f"{formatted_body}-{dv}"
 
 def detect_chrome_executable() -> Optional[str]:
-    """Busca la ubicación de Chrome en Windows por si es requerida por Selenium."""
+    """Busca la ubicación de Chrome (embebido/portátil o del sistema) en Windows para Selenium."""
+    try:
+        from apps.core.path_resolver import PathResolver
+        resolver = PathResolver()
+        portable_paths = [
+            str(resolver.get_path("chrome", "chrome.exe")),
+            str(resolver.get_path("chrome.exe")),
+            str(resolver.get_app_data_path("chrome", "chrome.exe"))
+        ]
+        for p_path in portable_paths:
+            if os.path.exists(p_path):
+                return p_path
+    except Exception:
+        pass
+
     candidates = [
         r"C:\Program Files\Google\Chrome\Application\chrome.exe",
         r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
@@ -683,8 +697,10 @@ def query_puertos(target: str) -> Dict[str, Any]:
     """Escaneo NMAP nativo o fallback a Socket."""
     try:
         # Intento con nmap.exe
-        result = subprocess.run(["nmap", "-Pn", "-p", "21,22,25,80,443,3306,3389,8080", target], 
-                                capture_output=True, text=True, timeout=15)
+        kwargs = {"capture_output": True, "text": True, "timeout": 15}
+        if os.name == "nt":
+            kwargs["creationflags"] = getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)
+        result = subprocess.run(["nmap", "-Pn", "-p", "21,22,25,80,443,3306,3389,8080", target], **kwargs)
         if result.returncode == 0:
             lines = result.stdout.split('\n')
             open_ports = []
@@ -739,7 +755,10 @@ def query_traceroute(target: str) -> Dict[str, Any]:
     """Ejecuta tracert (Windows) limitando a 15 saltos."""
     try:
         cmd = ["tracert", "-d", "-h", "15", "-w", "1000", target]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=25, encoding='cp850', errors='ignore')
+        kwargs = {"capture_output": True, "text": True, "timeout": 25, "encoding": "cp850", "errors": "ignore"}
+        if os.name == "nt":
+            kwargs["creationflags"] = getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)
+        result = subprocess.run(cmd, **kwargs)
         lines = result.stdout.split('\n')
         hops = [line.strip() for line in lines if " ms " in line or "*" in line]
         return {
@@ -799,10 +818,16 @@ def _icmp_alive(ip: str) -> bool:
     """Detecta si un host está activo via ping (Windows/Linux)."""
     try:
         flag = "-n" if os.name == "nt" else "-c"
+        kwargs = {
+            "stdout": subprocess.DEVNULL,
+            "stderr": subprocess.DEVNULL,
+            "timeout": 2
+        }
+        if os.name == "nt":
+            kwargs["creationflags"] = getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)
         r = subprocess.run(
             ["ping", flag, "1", "-w", "300", ip],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-            timeout=2
+            **kwargs
         )
         return r.returncode == 0
     except Exception:

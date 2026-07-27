@@ -51,12 +51,19 @@ try {
 
         # Framework Django y Servidor
         "--include-package=django",
+        "--include-package=django.core",
+        "--include-package=django.core.management",
+        "--include-package=django.db.migrations",
+        "--include-package=django.db.backends",
+        "--include-package=django.db.backends.sqlite3",
         "--include-package=django.contrib.admin",
         "--include-package=django.contrib.auth",
         "--include-package=django.contrib.contenttypes",
         "--include-package=django.contrib.sessions",
         "--include-package=django.contrib.messages",
         "--include-package=django.contrib.staticfiles",
+        "--include-package=wsgiref",
+        "--include-package-data=django",
 
         # PyQt6 GUI & QWebEngine
         "--include-package=PyQt6",
@@ -83,10 +90,18 @@ try {
         "--include-package=pandas",
         "--include-package=matplotlib",
         "--include-package=seaborn",
+        "--include-package=limits",
         "--include-package-data=fpdf",
+        "--include-package-data=matplotlib",
+        "--include-package-data=seaborn",
+        "--include-package-data=pandas",
+        "--include-package-data=dns",
+        "--include-package-data=limits",
 
         # Plugins Nuitka
         "--enable-plugin=pyqt6",
+        "--enable-plugin=numpy",
+        "--enable-plugin=matplotlib",
         "--enable-plugin=anti-bloat",
 
         "--no-deployment-flag=excluded-module-usage",
@@ -99,19 +114,40 @@ try {
     Write-Host "-> Ejecutando: python -m nuitka $($NuitkaArgs -join ' ')" -ForegroundColor DarkGray
     python -m nuitka @NuitkaArgs
 
-    # Inclusión post-compilación de DLLs gráficas críticas (Direct3D y Software OpenGL)
+    if ($LASTEXITCODE -ne 0) {
+        throw "La compilación de Nuitka falló con código $LASTEXITCODE"
+    }
+
+    # Inclusión post-compilación de DLLs gráficas y runtime Visual C++ para compatibilidad total
     $DistFolder = Join-Path $BuildOut "run_kiosk.dist"
     if (Test-Path $DistFolder) {
+        # Crear qt.conf en el directorio raíz ejecutable para que PyQt6 WebEngine funcione en cualquier PC limpia
+        $QtConfPath = Join-Path $DistFolder "qt.conf"
+        "[Paths]`nPrefix = PyQt6/Qt6`nLibraryExecutables = ." | Out-File -FilePath $QtConfPath -Encoding utf8 -Force
+        Write-Host "-> Archivo qt.conf autocontenido creado en: $QtConfPath" -ForegroundColor DarkGray
+
         $PyQt6Bin = (python -c "import PyQt6, os; print(os.path.join(os.path.dirname(PyQt6.__file__), 'Qt6', 'bin'))" 2>$null).Trim()
         if (-not (Test-Path $PyQt6Bin)) {
             $PyQt6Bin = "C:\Users\BetoRock Toledo\AppData\Local\Programs\Python\Python313\Lib\site-packages\PyQt6\Qt6\bin"
         }
-        $CriticalDlls = @("d3dcompiler_47.dll", "opengl32sw.dll", "msvcp140_1.dll", "msvcp140_2.dll")
-        foreach ($dll in $CriticalDlls) {
+        $QtDlls = @("d3dcompiler_47.dll", "opengl32sw.dll", "msvcp140_1.dll", "msvcp140_2.dll")
+        foreach ($dll in $QtDlls) {
             $src = Join-Path $PyQt6Bin $dll
             if (Test-Path $src) {
                 Copy-Item -Path $src -Destination $DistFolder -Force
-                Write-Host "-> DLL Copiada: $dll" -ForegroundColor DarkGray
+                Write-Host "-> Qt DLL Copiada: $dll" -ForegroundColor DarkGray
+            }
+        }
+        $System32Dlls = @(
+            "vcruntime140.dll", "vcruntime140_1.dll", "vcruntime140_threads.dll",
+            "msvcp140.dll", "msvcp140_1.dll", "msvcp140_2.dll", "msvcp140_atomic_wait.dll", "msvcp140_codecvt_ids.dll",
+            "concrt140.dll", "vccorlib140.dll"
+        )
+        foreach ($dll in $System32Dlls) {
+            $src = Join-Path "C:\Windows\System32" $dll
+            if (Test-Path $src) {
+                Copy-Item -Path $src -Destination $DistFolder -Force
+                Write-Host "-> System32 DLL Copiada: $dll" -ForegroundColor DarkGray
             }
         }
     }

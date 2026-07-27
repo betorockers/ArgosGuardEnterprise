@@ -272,8 +272,32 @@ Resultado PPU: {'Patente': 'BSYC81', 'Tipo': 'Camioneta', 'Marca': 'Chevrolet', 
 
 ---
 
+## 📅 Sesión: 2026-07-27 | Auditoría de Autocontención 100% & Release Todo en 1 v4.0.0
+**Ingeniero:** Antigravity (Staff Engineer & Architect)
+**Objetivo:** Auditoría de portabilidad estricta en Windows, corrección del fallo de `CreateProcess` (código 2), empaquetado de Google Chrome offline y generación del instalador final.
+
+### Trabajo Realizado
+- **Auditoría & Portabilidad 100%**:
+  - `detect_chrome_executable()` en `services.py` actualizado para buscar primero en `{app}\chrome\chrome.exe` mediante `PathResolver`.
+  - Inclusión explícita de plugins C++ Nuitka (`numpy`, `matplotlib`) y datos de paquetes Python (`matplotlib`, `seaborn`, `pandas`, `dns`, `limits`, `fpdf`, `tzdata`).
+- **Solución al Error CreateProcess Código 2**:
+  - Eliminada la dependencia no instalada `selenium_stealth` que detenía a Nuitka antes de compilar el binario ejecutable.
+  - Generado con 100% de éxito el archivo nativo C++ `ArgosGuardV4.exe` dentro de `backend_v4/build/run_kiosk.dist/`.
+- **Integración Google Chrome Offline**:
+  - Descargado el instalador offline desatendido de Google Chrome 64-bit (`chrome_installer.exe`, 148.2 MB) a `installer_v4/prereqs/`.
+  - Configurada la instalación silenciosa (`/silent /install`) condicional en `installer_v4.iss`.
+- **Suite de Pruebas Unitarias (`pytest`)**:
+  - **10/10 PASSED (100%)** en 27.30s (`core`, `monitoring`, `osint`, `security`, `licensing`).
+- **Empaquetado Final Inno Setup**:
+  - Generado [dist/ArgosGuard_Installer_v4.0.0.exe](file:///e:/ProyectoMonitoreoMod_V2/dist/ArgosGuard_Installer_v4.0.0.exe) de **411.95 MB** (100% autocontenido Todo en 1).
+
+**Estado:** ❄️ **CÓDIGO Y DISTRIBUCIÓN 100% CONGELADOS | INSTALADOR FINAL DE 411.95 MB LISTO PARA PRODUCCIÓN**
+
+---
+
 *Bitácora mantenida por Antigravity — Google DeepMind Team*
 *Destinatario: betorock · Betograf_inc*
+
 
 
 

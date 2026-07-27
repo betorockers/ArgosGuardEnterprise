@@ -21,7 +21,15 @@ class PathResolver:
 
     def _initialize(self):
         """Inicializa las rutas base detectando si la app está compilada."""
-        if getattr(sys, 'frozen', False) or '__compiled__' in globals():
+        import builtins
+        is_compiled = (
+            getattr(sys, 'frozen', False)
+            or hasattr(builtins, '__compiled__')
+            or '__compiled__' in globals()
+            or 'nuitka' in sys.modules
+            or not sys.executable.lower().endswith(('python.exe', 'pythonw.exe'))
+        )
+        if is_compiled:
             # Ejecución compilada (Nuitka / PyInstaller)
             self.base_dir = Path(sys.executable).parent.resolve()
         else:
