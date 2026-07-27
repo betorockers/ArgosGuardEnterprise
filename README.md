@@ -1,69 +1,98 @@
-# Argos Guard Enterprise v4.0.0 — Production Release (Todo en 1)
+# Argos Guard Enterprise v4.0.0 — Software Corporativo Táctico de Monitoreo & Ciberdefensa (Todo en 1)
 
-Plataforma empresarial monolítica modular de alta ciberseguridad, monitoreo táctico de nodos en tiempo real y suite de inteligencia OSINT.
+[![Release v4.0.0](https://img.shields.io/badge/Release-v4.0.0-blue.svg)](https://github.com/betorockers/ArgosGuardEnterprise/releases/tag/v4.0.0)
+[![Descargar Instalador](https://img.shields.io/badge/Descargar-Instalador_v4.0.0_(411MB)-green.svg)](https://github.com/betorockers/ArgosGuardEnterprise/releases/tag/v4.0.0)
+[![Licencia Perpetua](https://img.shields.io/badge/Licencia-Perpetua_HWID-purple.svg)](#-tiers-de-licenciamiento-comercial)
+[![Windows 10/11](https://img.shields.io/badge/OS-Windows_10%2F11_Home%2FPro%2FLTSC-0078D6.svg)](#-puntos-fuertes--filosofía-de-diseño-v400)
 
----
-
-## 🌟 Características Principales
-
-- **Arquitectura Monolítica Modular (Django 5.x)**: 5 aplicaciones desacopladas (`core`, `monitoring`, `osint`, `security`, `licensing`).
-- **Contenedor Nativo Kiosko (PyQt6 QWebEngineView)**: Interfaz gráfica de alta densidad, cero ventanas de consola popups (`CREATE_NO_WINDOW`), soporte de hot-reload y notificaciones omnicanal (Toasts + Audio + Telegram).
-- **Compilación Nativa a C++ (Nuitka)**: Traducción de código Python a binario ejecutable C++ nativo `ArgosGuardV4.exe` sin requerir interprete Python preinstalado.
-- **Base de Datos Cifrada Local**: SQLite / SQLCipher (AES-256) administrada en AppData seguro mediante `PathResolver`.
-- **100% Autocontenido y Portable**: Instalador ejecutable unico `dist/ArgosGuard_Installer_v4.0.0.exe` (**411.95 MB**) empaquetado con compresión sólida `lzma2/ultra64`, incluyendo instaladores desatendidos de **Microsoft Visual C++ Redistributable 2015-2022** y **Google Chrome 64-bit Offline Setup**.
+Plataforma monolítica modular nativa para monitoreo táctico de nodos en tiempo real, videovigilancia multi-protocolo, inteligencia OSINT y suite de ciberdefensa, empaquetada en un ejecutable **100% autocontenido y portable** para Windows.
 
 ---
 
-## 📁 Estructura del Monorepo v4.0.0
+## 🚀 Enlace Directo de Descarga del Release
+
+> [!IMPORTANT]
+> 📥 **[Descargar Argos Guard Enterprise v4.0.0 (Instalador Todo en 1 - 411 MB)](https://github.com/betorockers/ArgosGuardEnterprise/releases/tag/v4.0.0)**  
+> *Incluye binario nativo C++ `ArgosGuardV4.exe`, instaladores desatendidos de Google Chrome 64-bit y Microsoft Visual C++ 2015-2022 Redistributable, base de datos cifrada SQLCipher (AES-256) y runtime completo.*
+
+---
+
+## 🌟 Puntos Fuertes & Filosofía de Diseño v4.0.0
+
+- **100% Autocontenido & Air-Gapped**: Funciona en cualquier equipo host con Windows 10/11 sin necesidad de conexión a internet previa, Python ni dependencias de software preinstaladas.
+- **Arquitectura Monolítica Modular (Django 5.x + C++ Nuitka)**: 5 submódulos aislados (`core`, `monitoring`, `osint`, `security`, `licensing`) traducidos a binario ejecutable C++ nativo.
+- **Contenedor Nativo Kiosko (PyQt6 QWebEngineView)**: Interfaz gráfica táctica anti-flicker con supresión total de consolas emergentes (`CREATE_NO_WINDOW`) y notificaciones omnicanal (Toasts + Audio + Telegram).
+- **Seguridad Criptográfica**: Hashing Argon2id (OWASP 2024), JWT Dual-Token y licencias atadas a la huella digital física del procesador/tarjeta madre (HWID RSA-2048).
+
+---
+
+## 📈 Análisis Competitivo del Mercado (2026)
+
+| Competidor | Modelo Comercial | Costo Estimado (500 Nodos) | Ventajas Únicas de Argos Guard Enterprise |
+| :--- | :--- | :--- | :--- |
+| **PRTG Paessler** | Suscripción recurrente por sensor | **$3,500 - $5,000 USD / Año** | **Pago Único Perpetuo**. Sin cobros por sensores ni suscripciones. |
+| **Nagios XI** | Licencia inicial + mant. anual | **$3,500+ USD inicial** | **Kiosko Nativo Windows**. Instalación en 1 clic sin Linux complejo. |
+| **Datadog** | SaaS Nube | **$30,000+ USD / Año** | **100% Local / On-Premise**. Soberanía total de datos sin enviar IP a la nube. |
+| **Argos Guard Enterprise** | **Pago Único Perpetuo (HWID)** | **Desde $299 USD** | **Agentless L3/L7, SQLCipher Cifrado, OSINT + Videovigilancia Integrada**. |
+
+---
+
+## 💰 Tiers de Licenciamiento Comercial
+
+*Licenciamiento perpetuo de pago único sin mensualidades:*
+
+### 🟢 Argos Guard BASIC — $299 USD (Pago Único)
+- Hasta 50 nodos / IPs monitoreadas.
+- Ping ICMP/TCP de alta frecuencia y alertas sonoras.
+- Base de datos cifrada SQLite / SQLCipher.
+
+### 🔵 Argos Guard STANDARD — $699 USD (Pago Único - Recomendado)
+- Hasta 250 nodos / IPs monitoreadas.
+- Todo lo del plan Basic + Bot de Notificaciones Telegram en tiempo real.
+- Módulo de Videovigilancia (MJPEG/HLS/RTSP) y 3 usuarios RBAC.
+
+### 🟣 Argos Guard ENTERPRISE — $1,499 USD (Pago Único)
+- Nodos e IPs **ILIMITADAS**.
+- Todo lo del plan Standard + Auditoría de Red OSINT avanzada y exportación de reportes PDF.
+- Soporte prioritario y usuarios ilimitados.
+
+---
+
+## ⚙️ Arquitectura Técnica v4.0.0
 
 ```text
-ProyectoMonitoreoMod_V2/
-├── backend_v4/                # Monolito Django 5.x + PyQt6 Kiosk Runner
-│   ├── config/                # Configuración global Django WSGI/ASGI
-│   ├── apps/
-│   │   ├── core/              # PathResolver, AsyncRunner, Loggers
-│   │   ├── monitoring/        # TelemetryDaemon, TargetNodes, Events
-│   │   ├── osint/             # Scrapers Selenium/HTTP, DNS Resolver
-│   │   ├── security/          # RBAC, JWT, Argon2id, Firewall Controls
-│   │   └── licensing/         # RSA HWID System Licensing
-│   ├── static/                # Temas CSS, imágenes, efectos sonoros MP3
-│   ├── templates/             # Plantillas HTML5 HTMX / Alpine.js
-│   └── run_kiosk.py           # Entrypoint Kiosko Nativo PyQt6
-├── build_v4.ps1               # Script de Compilación Nuitka C++ Standalone
-├── installer_v4/              # Inno Setup Script (installer_v4.iss) + Prerrequisitos (Chrome/VC++)
-├── dist/                      # Salida del Instalador (ArgosGuard_Installer_v4.0.0.exe)
-├── diagnosticos_y_pruebas/    # Centralización de reportes de pruebas (pytest 10/10)
-└── estudio y mejoras/         # Planes de implementación (v4.0 y v4.1) y Walkthroughs
+┌─────────────────────────────────────────────────────────────┐
+│               ARGOS GUARD ENTERPRISE V4.0.0                 │
+├─────────────────────────────────────────────────────────────┤
+│  PyQt6 QWebEngineView (Contenedor Kiosko Nativo Borderless) │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │ UI HTMX + Alpine.js (6 Tabs Tácticas Anti-Flicker)    │  │
+│  └───────────────────────────▲───────────────────────────┘  │
+│                              │ WS / REST                    │
+│  ┌───────────────────────────▼───────────────────────────┐  │
+│  │ Django 5.x WSGI Server (Monolito C++ Nuitka)          │  │
+│  │ ├─ TelemetryDaemon (ICMP/TCP Probes Asíncronas)       │  │
+│  │ ├─ OSINT Automation & Scrapers (Selenium / DNS)       │  │
+│  │ └─ Security & Auth (Argon2id, Dual-Token JWT, RBAC)   │  │
+│  └───────────────────────────▲───────────────────────────┘  │
+│                              │                              │
+│  ┌───────────────────────────▼───────────────────────────┐  │
+│  │ Base de Datos Cifrada Local (SQLCipher AES-256)       │  │
+│  └───────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🛠️ Ejecución en Desarrollo
+## 🛠️ Instalación y Requisitos
 
-```powershell
-cd backend_v4
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python run_kiosk.py
-```
+- **Sistema Operativo**: Windows 10 / 11 (Home, Pro, LTSC, IoT) de 64 bits.
+- **Instalación en 1-Clic**: Descargar y ejecutar `ArgosGuard_Installer_v4.0.0.exe`. El instalador configurará automáticamente los binarios y prerrequisitos.
 
 ---
 
-## 📦 Compilación C++ y Empaquetado
+## 👥 Empresa y Desarrollador
 
-```powershell
-# 1. Compilar binario C++ con Nuitka:
-powershell -ExecutionPolicy Bypass -File .\build_v4.ps1
-
-# 2. Generar Instalador Inno Setup:
-ISCC.exe installer_v4\installer_v4.iss
-```
-
----
-
-## 📄 Documentación y Registros
-- 📄 [DOCUMENTACION_MAESTRA.md](file:///e:/ProyectoMonitoreoMod_V2/DOCUMENTACION_MAESTRA.md)
-- 📄 [ancla.md](file:///e:/ProyectoMonitoreoMod_V2/ancla.md)
-- 📄 [bitacora.md](file:///e:/ProyectoMonitoreoMod_V2/bitacora.md)
-- 📁 [estudio y mejoras/implementation_plan_v4.1_cyberdefense.md](file:///e:/ProyectoMonitoreoMod_V2/estudio%20y%20mejoras/implementation_plan_v4.1_cyberdefense.md)
+Desarrollado de forma exclusiva por **Betograf_inc**  
+*Staff Architect:* **betorock**  
+*Repositorio Oficial:* [github.com/betorockers/ArgosGuardEnterprise](https://github.com/betorockers/ArgosGuardEnterprise)
